@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DoubleSpeed · Post Viewer</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<div class="shell">
+
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-icon">DS</div>
+      <span>DoubleSpeed</span>
+      <span class="brand-sub">· Post Viewer</span>
+    </div>
+    <div class="topbar-right">
+      <div class="status-badge">
+        <div class="status-dot" id="statusDot"></div>
+        <span id="statusText">Loading...</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="sidebar" id="sidebarList">
+    <div class="sb-label">Clients</div>
+    {% for p in products %}
+    <div class="sb-item" data-pid="{{ p.id }}" onclick="App.selectProduct('{{ p.id }}')">
+      <span class="icon">◈</span>
+      <span>{{ p.title }}</span>
+    </div>
+    {% endfor %}
+    {% if not products %}
+    <div id="sidebarEmpty" style="padding:12px 16px; font-size:12px; color:var(--text-3);">
+      Loading clients...
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="main">
+
+    <!-- ══════ Connection Warning ══════ -->
+    <div class="card mb-md hidden" id="connWarning" style="border-color:var(--orange); background:rgba(255,169,77,.06);">
+      <div style="display:flex; align-items:center; gap:8px; color:var(--orange); font-size:13px;">
+        <span style="font-size:18px;">⚠</span>
+        <span id="connWarningMsg">No clients loaded. Check your Supabase key.</span>
+      </div>
+    </div>
+
+    <!-- ══════ Controls ══════ -->
+    <div class="card mb-md" id="controls">
+      <div class="g3-controls">
+        <div>
+          <label class="label">Client</label>
+          <select id="productSelect" onchange="App.onProductChange(this.value)">
+            <option value="">Select client...</option>
+            {% for p in products %}
+            <option value="{{ p.id }}">{{ p.title }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label class="label">Template</label>
+          <select id="templateSelect" disabled onchange="App.onTemplateChange()">
+            <option value="">Select template...</option>
+          </select>
+        </div>
+        <div>
+          <label class="label">Hours Back</label>
+          <select id="hoursSelect">
+            <option value="24">24 hours</option>
+            <option value="48">48 hours</option>
+            <option value="72">72 hours</option>
+            <option value="168">7 days</option>
+            <option value="720" selected>30 days</option>
+            <option value="2160">90 days</option>
+            <option value="0">All time</option>
+          </select>
+        </div>
+      </div>
+      <div class="mt-md btn-row">
+        <button class="btn btn-p" id="fetchBtn" onclick="App.fetchPosts()" disabled>⟶ Fetch Posts</button>
+        <button class="btn btn-g hidden" id="exportBtn" onclick="App.exportCSV()">↓ Export CSV</button>
+        <span id="fetchStatus" style="font-size:12px; color:var(--text-3); margin-left:8px;"></span>
+      </div>
+    </div>
+
+    <!-- ══════ Stats ══════ -->
+    <div class="g4 mb-md hidden" id="statsRow"></div>
+
+    <!-- ══════ Posts Table ══════ -->
+    <div class="card hidden" id="postsCard">
+      <div class="card-head">
+        <div class="card-title">Posts</div>
+        <div class="card-sub" id="postsSub"></div>
+      </div>
+      <div id="postsContainer"></div>
+    </div>
+
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
