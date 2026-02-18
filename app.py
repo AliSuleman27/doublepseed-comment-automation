@@ -16,9 +16,9 @@ load_dotenv()
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from services.supabase_adapter import (
-    get_products, get_product_by_id,
+    get_products,
     get_templates_for_product, get_accounts_for_product,
-    get_posts, get_all_posts_for_product, test_connection,
+    get_all_posts_for_product, test_connection,
 )
 
 app = Flask(__name__)
@@ -70,13 +70,14 @@ def api_fetch_posts():
     data = request.json
     product_id = data.get("product_id")
     template_id = data.get("template_id")
-    hours = data.get("hours_back", 24)
+    start_date = data.get("start_date")
+    end_date = data.get("end_date")
 
     if not product_id:
         return jsonify({"error": "product_id required"}), 400
 
     try:
-        posts = get_all_posts_for_product(product_id, template_id, hours)
+        posts = get_all_posts_for_product(product_id, template_id, start_date, end_date)
     except Exception as e:
         return jsonify({"error": f"Database error: {str(e)}"}), 500
 
@@ -98,6 +99,10 @@ def api_fetch_posts():
             "num_slides": p.get("num_slides"),
             "post_time": p.get("post_time"),
             "template_id": p.get("template_id"),
+            "template_name": p.get("template_name", ""),
+            "client_name": p.get("client_name", ""),
+            "scene_data": p.get("scene_data"),
+            "created_at": p.get("created_at", ""),
             "status": p.get("status"),
         })
 

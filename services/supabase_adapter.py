@@ -3,7 +3,7 @@ DoubleSpeed — Supabase Adapter
 Queries the real DB: frontend_product, frontend_account, frontend_post
 """
 import os, json
-from collections import Counter, defaultdict
+from collections import Counter
 from datetime import datetime, timedelta, timezone
 from supabase import create_client
 
@@ -66,63 +66,47 @@ def get_product_by_id(product_id):
 
 # ─── Templates ────────────────────────────────────
 def get_templates_for_product(product_id):
-    """Get distinct templates used by succeeded posts of this product.
-    Derives template title from the hook (first slide text) of a sample post."""
+    """Get distinct templates used by succeeded slideshow posts of this product.
+    Fetches template names from frontend_template_v2."""
     sb = get_sb()
-    # Get template_id + scene_data from recent posts to derive titles
+    # Get distinct template_ids from succeeded slideshow posts for this product
     res = sb.table("frontend_post").select(
-        "template_id, scene_data, caption, title"
+        "template_id"
     ).eq("product_id", product_id
     ).eq("status", "succeeded"
-    ).order("post_time", desc=True
+    ).eq("type", "slideshow"
     ).execute()
 
     if not res.data:
         return []
 
-    # Group by template_id: count + grab first sample for title derivation
+    # Count posts per template
     tid_counts = Counter()
-    tid_sample = {}
     for row in res.data:
         tid = row.get("template_id")
-        if not tid:
-            continue
-        tid_counts[tid] += 1
-        if tid not in tid_sample:
-            tid_sample[tid] = row
+        if tid:
+            tid_counts[tid] += 1
 
     if not tid_counts:
         return []
 
+    # Fetch template names from frontend_template_v2
+    template_ids = list(tid_counts.keys())
+    t_res = sb.table("frontend_template_v2").select("id, name").in_("id", template_ids).execute()
+    name_map = {}
+    if t_res.data:
+        for t in t_res.data:
+            name_map[t["id"]] = t.get("name", "")
+
     templates = []
     for tid, count in tid_counts.items():
-        sample = tid_sample[tid]
-        title = _derive_template_title(sample)
         templates.append({
             "id": tid,
-            "title": title,
+            "title": name_map.get(tid, f"Template {tid[:8]}"),
             "post_count": count,
         })
 
-    return sorted(templates, key=lambda t: t.get("post_count", 0), reverse=True)
-
-
-def _derive_template_title(post_sample):
-    """Derive a human-readable template title from a sample post's hook text."""
-    # Try to get the hook (first text block from first page of scene_data)
-    sd = _parse_json(post_sample.get("scene_data"))
-    if sd:
-        hook = _extract_hook(sd)
-        if hook:
-            # Truncate to a readable label
-            return _truncate(hook, 60)
-
-    # Fallback: use caption
-    caption = post_sample.get("caption") or post_sample.get("title") or ""
-    if caption:
-        return _truncate(caption, 60)
-
-    return f"Template {post_sample.get('template_id', '?')[:8]}"
+    return sorted(templates, key=lambda t: t.get("title", ""), reverse=True)
 
 
 def _extract_hook(scene):
@@ -130,7 +114,6 @@ def _extract_hook(scene):
     pages = scene.get("pages", [])
     if not pages:
         return None
-    # Respect page order if available
     page_order = scene.get("pageOrder", [])
     if page_order:
         page_map = {p["id"]: p for p in pages}
@@ -142,14 +125,6 @@ def _extract_hook(scene):
         if block.get("type") == "text" and block.get("text"):
             return block["text"].strip()
     return None
-
-
-def _truncate(text, maxlen=60):
-    """Truncate text to maxlen chars with ellipsis."""
-    text = text.replace("\n", " ").strip()
-    if len(text) <= maxlen:
-        return text
-    return text[:maxlen-1].rstrip() + "…"
 
 
 # ─── Accounts ─────────────────────────────────────
@@ -183,30 +158,52 @@ def get_posts(product_id, template_id, hours_back=24):
     return _enrich_posts(sb, posts)
 
 
-def get_all_posts_for_product(product_id, template_id=None, hours_back=72):
-    """Get all succeeded posts, optionally filtered by template.
-    hours_back=0 means all time (no time filter)."""
+def get_all_posts_for_product(product_id, template_id=None, start_date=None, end_date=None):
+    """Get all succeeded slideshow posts, optionally filtered by template and date range.
+    Uses created_at for time filtering."""
     sb = get_sb()
 
     query = sb.table("frontend_post").select(
         "id, account_id, template_id, title, tiktok_post_id, caption, "
         "scene_data, template_data, status, post_time, num_slides, type, "
-        "succeeded_at, product_id"
+        "succeeded_at, product_id, created_at"
     ).eq("product_id", product_id
     ).eq("status", "succeeded"
-    ).order("post_time", desc=True
+    ).eq("type", "slideshow"
+    ).order("created_at", desc=True
     ).limit(200)
 
-    if hours_back and hours_back > 0:
-        since = (datetime.now(timezone.utc) - timedelta(hours=hours_back)).isoformat()
-        query = query.gte("post_time", since)
+    if start_date:
+        query = query.gte("created_at", start_date)
+    if end_date:
+        query = query.lte("created_at", end_date)
 
     if template_id:
         query = query.eq("template_id", template_id)
 
     res = query.execute()
     posts = res.data or []
-    return _enrich_posts(sb, posts)
+
+    # Fetch template names from frontend_template_v2
+    template_ids = list(set(p["template_id"] for p in posts if p.get("template_id")))
+    template_name_map = {}
+    if template_ids:
+        t_res = sb.table("frontend_template_v2").select("id, name").in_("id", template_ids).execute()
+        if t_res.data:
+            for t in t_res.data:
+                template_name_map[t["id"]] = t.get("name", "")
+
+    # Get product title for client_name
+    p_res = sb.table("frontend_product").select("id, title").eq("id", product_id).limit(1).execute()
+    client_name = p_res.data[0]["title"] if p_res.data else ""
+
+    enriched = _enrich_posts(sb, posts)
+    for p in enriched:
+        p["template_name"] = template_name_map.get(p.get("template_id"), "")
+        p["client_name"] = client_name
+        p["created_at"] = p.get("created_at", "")
+
+    return enriched
 
 
 def _enrich_posts(sb, posts):

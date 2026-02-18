@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DoubleSpeed · Post Viewer</title>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" href="https://app.doublespeed.ai/ds.ico" type="image/x-icon">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
@@ -12,9 +13,12 @@
 
   <div class="topbar">
     <div class="brand">
-      <div class="brand-icon">DS</div>
-      <span>DoubleSpeed</span>
-      <span class="brand-sub">· Post Viewer</span>
+      <img src="https://app.doublespeed.ai/ds.ico" alt="DS" class="brand-logo">
+      <span>doublespeed</span>
+    </div>
+    <div class="topbar-tabs">
+      <button class="tab-btn active" data-tab="posts" onclick="App.switchTab('posts')">Post Viewer</button>
+      <button class="tab-btn" data-tab="comments" onclick="App.switchTab('comments')">Comment Engine</button>
     </div>
     <div class="topbar-right">
       <div class="status-badge">
@@ -25,7 +29,7 @@
   </div>
 
   <div class="sidebar" id="sidebarList">
-    <div class="sb-label">Clients</div>
+    <div class="sb-label">Managed Clients</div>
     {% for p in products %}
     <div class="sb-item" data-pid="{{ p.id }}" onclick="App.selectProduct('{{ p.id }}')">
       <span class="icon">◈</span>
@@ -39,9 +43,11 @@
     {% endif %}
   </div>
 
-  <div class="main">
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- POST VIEWER TAB                             -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div class="main" id="viewPosts">
 
-    <!-- ══════ Connection Warning ══════ -->
     <div class="card mb-md hidden" id="connWarning" style="border-color:var(--orange); background:rgba(255,169,77,.06);">
       <div style="display:flex; align-items:center; gap:8px; color:var(--orange); font-size:13px;">
         <span style="font-size:18px;">⚠</span>
@@ -49,9 +55,8 @@
       </div>
     </div>
 
-    <!-- ══════ Controls ══════ -->
     <div class="card mb-md" id="controls">
-      <div class="g3-controls">
+      <div class="g4-controls">
         <div>
           <label class="label">Client</label>
           <select id="productSelect" onchange="App.onProductChange(this.value)">
@@ -68,29 +73,23 @@
           </select>
         </div>
         <div>
-          <label class="label">Hours Back</label>
-          <select id="hoursSelect">
-            <option value="24">24 hours</option>
-            <option value="48">48 hours</option>
-            <option value="72">72 hours</option>
-            <option value="168">7 days</option>
-            <option value="720" selected>30 days</option>
-            <option value="2160">90 days</option>
-            <option value="0">All time</option>
-          </select>
+          <label class="label">Start Date</label>
+          <input type="date" id="startDate" class="input">
+        </div>
+        <div>
+          <label class="label">End Date</label>
+          <input type="date" id="endDate" class="input">
         </div>
       </div>
       <div class="mt-md btn-row">
-        <button class="btn btn-p" id="fetchBtn" onclick="App.fetchPosts()" disabled>⟶ Fetch Posts</button>
-        <button class="btn btn-g hidden" id="exportBtn" onclick="App.exportCSV()">↓ Export CSV</button>
+        <button class="btn btn-p" id="fetchBtn" onclick="App.fetchPosts()" disabled>Fetch Posts</button>
+        <button class="btn btn-g hidden" id="exportBtn" onclick="App.exportCSV()">Export CSV</button>
         <span id="fetchStatus" style="font-size:12px; color:var(--text-3); margin-left:8px;"></span>
       </div>
     </div>
 
-    <!-- ══════ Stats ══════ -->
     <div class="g4 mb-md hidden" id="statsRow"></div>
 
-    <!-- ══════ Posts Table ══════ -->
     <div class="card hidden" id="postsCard">
       <div class="card-head">
         <div class="card-title">Posts</div>
@@ -98,8 +97,107 @@
       </div>
       <div id="postsContainer"></div>
     </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- COMMENT ENGINE TAB                          -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div class="main hidden" id="viewComments">
+
+    <!-- Pipeline Stages -->
+    <div class="pipeline-bar mb-md">
+      <div class="pipe-stage active" data-stage="select">
+        <div class="pipe-num">1</div>
+        <div class="pipe-label">Select Posts</div>
+      </div>
+      <div class="pipe-connector"></div>
+      <div class="pipe-stage" data-stage="archetype">
+        <div class="pipe-num">2</div>
+        <div class="pipe-label">Archetypes</div>
+      </div>
+      <div class="pipe-connector"></div>
+      <div class="pipe-stage" data-stage="generate">
+        <div class="pipe-num">3</div>
+        <div class="pipe-label">Generate</div>
+      </div>
+      <div class="pipe-connector"></div>
+      <div class="pipe-stage" data-stage="validate">
+        <div class="pipe-num">4</div>
+        <div class="pipe-label">Validate</div>
+      </div>
+      <div class="pipe-connector"></div>
+      <div class="pipe-stage" data-stage="export">
+        <div class="pipe-num">5</div>
+        <div class="pipe-label">Export</div>
+      </div>
+    </div>
+
+    <!-- Comment Engine Controls -->
+    <div class="card mb-md">
+      <div class="g5-controls">
+        <div>
+          <label class="label">Client</label>
+          <select id="ceProductSelect" onchange="App.ceOnProductChange(this.value)">
+            <option value="">Select client...</option>
+            {% for p in products %}
+            <option value="{{ p.id }}">{{ p.title }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label class="label">Template</label>
+          <select id="ceTemplateSelect" disabled onchange="App.ceOnTemplateChange()">
+            <option value="">Select template...</option>
+          </select>
+        </div>
+        <div>
+          <label class="label">Date</label>
+          <input type="date" id="ceDate" class="input">
+        </div>
+        <div>
+          <label class="label">Model</label>
+          <select id="ceModel">
+            <option value="claude-haiku">Claude Haiku</option>
+            <option value="gpt-4o-mini">GPT-4o-mini</option>
+            <option value="gemini-flash">Gemini Flash</option>
+          </select>
+        </div>
+        <div>
+          <label class="label">Batch Size</label>
+          <select id="ceBatchSize">
+            <option value="5">5 posts</option>
+            <option value="8" selected>8 posts</option>
+          </select>
+        </div>
+      </div>
+      <div class="mt-md btn-row">
+        <button class="btn btn-p" id="ceLoadBtn" onclick="App.ceLoadPosts()" disabled>Load Posts</button>
+        <span id="ceLoadStatus" style="font-size:12px; color:var(--text-3); margin-left:8px;"></span>
+      </div>
+    </div>
+
+    <!-- Comment Engine Stats -->
+    <div class="g5 mb-md hidden" id="ceStatsRow"></div>
+
+    <!-- Batch Actions -->
+    <div class="card mb-md hidden" id="ceBatchActions">
+      <div class="card-head">
+        <div class="card-title">Batch Actions</div>
+        <div class="card-sub" id="ceBatchSub"></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-p" id="ceAssignBtn" onclick="App.ceAssignArchetypes()">Assign Archetypes</button>
+        <button class="btn btn-p" id="ceGenerateBtn" onclick="App.ceGenerate()" disabled>Generate Comments</button>
+        <button class="btn btn-s" id="ceValidateBtn" onclick="App.ceValidate()" disabled>Validate All</button>
+        <button class="btn btn-g" id="ceExportBtn" onclick="App.ceExport()" disabled>Export Comments</button>
+      </div>
+    </div>
+
+    <!-- Posts with Comments -->
+    <div class="hidden" id="cePostsList"></div>
 
   </div>
+
 </div>
 
 <script src="{{ url_for('static', filename='js/app.js') }}"></script>
