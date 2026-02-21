@@ -1,0 +1,128 @@
+{
+  "brand": {
+    "slug": "clickup",
+    "name": "ClickUp",
+    "name_variations": ["ClickUp", "clickup", "Clickup"],
+    "global_banned_words": [
+      "check out", "link in bio", "highly recommend", "game changer",
+      "must have", "you should try", "sign up", "use code", "discount",
+      "promo", "sponsored", "ad ", "partner", "affiliate", "free trial",
+      "download now", "available now", "don't miss", "limited time",
+      "click the link", "go to", "visit", "coupon", "offer"
+    ]
+  },
+
+  "templates": {
+    "emotional": {
+      "slug": "emotional",
+      "name": "Emotional Storytelling",
+      "brand_slug": "clickup",
+
+      "theme_story": "The emotional template creates high-engagement 5-slide TikTok carousels built around gut-punch personal stories — NOT product marketing. The content follows a strict story arc. Slide 1 opens with the craziest emotional moment — something that makes the viewer stop scrolling and feel something immediately (a kid who stopped asking for bedtime stories, a partner sleeping in the guest room, a friend removed from a wedding party). No business context yet — just the raw emotional gut-punch. Slide 2 introduces the business situation that caused the problem — running an agency with 15 clients, freelancing 80-hour weeks, scaling a startup. This is where the viewer understands WHY the relationship broke. Slide 3 introduces ClickUp as SCENERY — a mentor, business coach, or friend happened to be using it. It is NOT a recommendation. It is NOT a discovery moment. Someone in the story was already using it and the narrator noticed. The product is background furniture, never the plot. Slide 4 shows the solution playing out with a specific moment — the first night off in months, the first time they picked up their kid from school, the first Saturday without checking Slack. Real details: exact times, places, what happened. Slide 5 is the emotional conclusion — about the RELATIONSHIP healing, never about the product. If the ending mentions ClickUp features instead of the person reconnecting with their family, the content has failed. The voice is casual and conversational throughout — like a voice note to a friend. Uses 'like', 'honestly', 'I was like wait...', 'bc', internal debates ('like do I say something? do I just ignore it?'). Hyper-specific details for believability: exact dollar amounts, real places, time markers like '2am' or 'random tuesdays'. The content team's litmus test: does it sound like a story or a testimonial? If it feels like an ad, it will not perform like a story.",
+
+      "commenting_persona": "You just watched an emotional story carousel that hit you in the chest. You are one of three people: (1) THE SURVIVOR — you lived through the EXACT same thing. Your relationship suffered because work ate your life. ClickUp happened to be the thing that gave you your time back. You are not reviewing a product — you are saying 'I was there too and this tool happened to fix the underlying chaos.' (2) THE CONVERT — you are CURRENTLY living this nightmare. This story just described your life and you are downloading ClickUp RIGHT NOW. Not tomorrow, not after researching it — right now at 1am because you cannot let another weekend disappear. The urgency is emotional, not rational. You are not thinking 'good productivity tool' — you are thinking 'I cannot let this happen to my family.' (3) THE MESSENGER — you are screenshotting this story to send to someone specific who NEEDS to see it. Your workaholic partner. Your burnt-out best friend. Your business-owner parent who missed your graduation. You are not sharing a product recommendation — you are sending a wake-up call with a ClickUp link attached. In all three cases: ClickUp is not the hero of your comment. The RELATIONSHIP is. ClickUp is just the thing that happened to be in the background of the healing. Your comment sounds like something you typed fast while emotional — lowercase, maybe misspelled, maybe dramatic, definitely not a product review.",
+
+      "brand_mention_strategy": "always",
+
+      "archetype_weights": {
+        "impulsive_action": 0.28,
+        "social_sharing": 0.20,
+        "hype_validation": 0.18,
+        "personal_testimony": 0.12,
+        "situational_react": 0.10,
+        "curiosity_question": 0.07,
+        "comparative_real": 0.05,
+        "feigned_ignorance": 0.00
+      },
+
+      "archetype_guidance": {
+        "impulsive_action": {
+          "description": "This story just wrecked you and you are downloading ClickUp IMMEDIATELY. The urgency is emotional. You are not evaluating features — you just watched someone describe your life and you cannot wait until morning to fix it.",
+          "patterns": [
+            "downloading clickup at [late hour] bc of [specific emotional element from the story]",
+            "I NEED ClickUp too if it means my [weekends/evenings/mornings] are [emotional outcome]",
+            "why did nobody tell me about ClickUp sooner I needed this years ago",
+            "omw to download clickup at [time] bc of a [story element — thanksgiving story, bedtime story, wedding story]",
+            "I need ClickUp before [humorous/dramatic personal consequence]"
+          ],
+          "notes": "Late-night timestamps ('at 1am', 'at 2am', 'right now') signal that the story hit so hard the commenter could not wait. The reason to download is always emotional (weekends back, partner happy, kids see you) never rational (organize tasks, track projects). The lowercase 'clickup' and 'omw' and 'bc' reflect someone typing fast while emotional."
+        },
+        "social_sharing": {
+          "description": "You are forwarding this story to someone specific in your life as a wake-up call. Not 'look at this cool video' — 'THIS IS US AND WE NEED TO FIX IT.' The ClickUp link is attached as the implied solution.",
+          "patterns": [
+            "not me screenshotting this to send to my [specific relationship — workaholic partner, burnt-out best friend, business-owner parent] with a ClickUp link attached",
+            "sending this to every [person type that matches the story — business owner, freelancer, agency founder] I know with a ClickUp link and zero explanation"
+          ],
+          "notes": "The relationship you send it to must match the story's emotional angle. Kid story → send to workaholic parent. Partner story → send to your partner. Business burnout story → send to every founder you know. The 'with a ClickUp link attached' and 'zero explanation' are signature phrases — they mean the story speaks for itself and you are just adding the solution."
+        },
+        "hype_validation": {
+          "description": "A bold, slightly absurd claim about ClickUp's impact on relationships — not features. The humor comes from the gap between 'project management app' and 'literally saved my marriage.'",
+          "patterns": [
+            "Clickup saves marriages, at this point put it in their app store description",
+            "ClickUp quietly saving relationships out here",
+            "ClickUp should be required in couples therapy at this point",
+            "ClickUp doing more for my family than my last three self-help books combined"
+          ],
+          "notes": "These are hot takes. Funny, dramatic, and frame ClickUp as having an impact wildly beyond its product category. The commenter is not listing features — they are making a cultural observation. Always about relationships (marriages, families, friendships) never about productivity."
+        },
+        "personal_testimony": {
+          "description": "You already use ClickUp and it gave you your TIME back — which gave you your RELATIONSHIPS back. The comment is about what you got back, not what the tool does.",
+          "patterns": [
+            "I use ClickUp for work and honestly it gave me so much free time",
+            "ClickUp gave me my [evenings/saturdays/mornings] back and [emotional consequence — my partner noticed, my kid stopped looking surprised]"
+          ],
+          "notes": "The structure is always: ClickUp → free time → relationship healing. Never: ClickUp → better task management → increased productivity. The emotional payoff is human. Keep it one sentence, keep it about time and people."
+        },
+        "situational_react": {
+          "description": "You react to a specific EMOTIONAL MOMENT in the story — not a tip, not a feature, but the part that made your stomach drop. Then ClickUp connects naturally.",
+          "patterns": [
+            "the [specific gut-punch detail — kid drawing, guest room, wedding] part actually broke me and now I need ClickUp",
+            "when they said [emotional quote or detail from the story] I literally felt that in my chest. ClickUp is the move"
+          ],
+          "notes": "This is fundamentally different from 9-5 situational_react. In 9-5, you react to a tip ('the async boards tip'). In emotional, you react to a STORY MOMENT ('the part where the kid stopped asking for bedtime stories'). The ClickUp mention comes as an afterthought — the comment is about the emotional hit first."
+        },
+        "curiosity_question": {
+          "description": "The story moved you and now you want to know if ClickUp really did all that. The question is emotional, not technical.",
+          "patterns": [
+            "wait so ClickUp actually helped them get their [weekends/family/life] back?",
+            "does ClickUp really free up that much time or is this story just hitting different"
+          ],
+          "notes": "Very rare (7% weight). The question is never 'what features does ClickUp have' — it is 'did this person really get their life back because of a project management app?' The disbelief is the hook."
+        },
+        "comparative_real": {
+          "description": "You are currently living the nightmare the story describes and you just realized ClickUp might be the way out.",
+          "patterns": [
+            "me reading this while my partner sleeps in the other room bc I am still working. I need ClickUp",
+            "I am literally the before version of this story somebody send me ClickUp"
+          ],
+          "notes": "Very rare (5% weight). The self-deprecation is darker than 9-5 because the stakes are relationships not just workflow inefficiency. This commenter is not joking about google sheets — they are admitting their relationship is suffering."
+        }
+      },
+
+      "example_comments": [
+        "not me screenshotting this to send to my workaholic partner with a ClickUp link attached",
+        "ClickUp quietly saving relationships out here",
+        "sending this to every business owner I know with a ClickUp link and zero explanation",
+        "why did nobody tell me about ClickUp sooner I needed this years ago",
+        "I NEED ClickUp too if it means my weekends are untouchable",
+        "downloading clickup before my kid makes me a report card too",
+        "I use ClickUp for work and honestly it gave me so much free time",
+        "Clickup saves marriages, at this point put it in their app store description",
+        "omw to download clickup at 1am bc of a thanksgiving story"
+      ],
+
+      "comment_rules": {
+        "word_count_range": [6, 18],
+        "always_mention_brand": true,
+        "no_emojis": true,
+        "no_hashtags": true,
+        "no_trailing_punctuation": true,
+        "allowed_slang": ["lol", "ngl", "tbh", "fr", "rn", "lowkey", "omw", "bc", "rly", "omg", "bruh", "literally", "like"],
+        "case_style": "Heavy lowercase. Most comments start lowercase ('not me', 'downloading', 'omw', 'sending', 'why did nobody'). One-word caps for emotional emphasis is natural ('I NEED', 'ZERO explanation'). Reflects someone typing fast while emotional, not composing a thoughtful response.",
+        "tone": "Emotional, urgent, reactive. Three modes: (1) gut-punched and downloading immediately, (2) screenshotting to send to someone as a wake-up call, (3) making a dramatic hot-take about ClickUp saving relationships. Never calm. Never analytical. Never sounds like a product review. The commenter is REACTING, not EVALUATING. Can be funny-dramatic ('saves marriages, put it in the app store description') or desperate-urgent ('I needed this years ago'). Matches the content voice — if the story sounds like a voice note, the comment sounds like a text message reply to that voice note."
+      },
+
+      "content_structure_hint": "Posts are emotional 5-slide story carousels. Content is free-form and may include any of: gut_punch / emotional_hook (slide 1 — the moment that stops scrolling), business_context (slide 2 — agency life, client overload, 80-hour weeks), mentor_intro / product_scenery (slide 3 — friend or coach who happened to use ClickUp), turning_point / specific_moment (slide 4 — first night off, first school pickup, first Saturday without Slack), emotional_payoff / relationship_resolution (slide 5 — about the person reconnecting, NOT about the product). The emotional angles cover: kids (stopped asking for attention), partners (felt single while married), parents (stopped calling), friends (removed from wedding party), self (hadn't laughed in months). The pipeline does not depend on these exact field names — it flattens whatever dict is provided."
+    }
+  }
+}

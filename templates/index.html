@@ -56,7 +56,7 @@
     </div>
 
     <div class="card mb-md" id="controls">
-      <div class="g4-controls">
+      <div class="g6-controls">
         <div>
           <label class="label">Client</label>
           <select id="productSelect" onchange="App.onProductChange(this.value)">
@@ -79,6 +79,20 @@
         <div>
           <label class="label">End Date</label>
           <input type="date" id="endDate" class="input">
+        </div>
+        <div>
+          <label class="label">Status</label>
+          <select id="statusFilter">
+            <option value="succeeded">Succeeded</option>
+            <option value="succeeded,scheduled">Succeeded + Scheduled</option>
+          </select>
+        </div>
+        <div>
+          <label class="label">Link Filter</label>
+          <select id="postFilter">
+            <option value="all">All Posts</option>
+            <option value="with_link">With TikTok Link</option>
+          </select>
         </div>
       </div>
       <div class="mt-md btn-row">
@@ -132,9 +146,22 @@
       </div>
     </div>
 
+    <!-- Config Upload -->
+    <div class="card mb-md" id="ceConfigCard">
+      <div class="card-head">
+        <div class="card-title">Brand Config</div>
+        <div class="card-sub" id="ceConfigStatus">No config loaded</div>
+      </div>
+      <div class="btn-row">
+        <input type="file" id="ceConfigFile" accept=".json" style="display:none" onchange="App.ceUploadConfig(this)">
+        <button class="btn btn-p" onclick="document.getElementById('ceConfigFile').click()">Upload Config JSON</button>
+        <span id="ceConfigInfo" style="font-size:12px; color:var(--text-3);"></span>
+      </div>
+    </div>
+
     <!-- Comment Engine Controls -->
     <div class="card mb-md">
-      <div class="g5-controls">
+      <div class="ce-controls-grid">
         <div>
           <label class="label">Client</label>
           <select id="ceProductSelect" onchange="App.ceOnProductChange(this.value)">
@@ -155,6 +182,13 @@
           <input type="date" id="ceDate" class="input">
         </div>
         <div>
+          <label class="label">Status</label>
+          <select id="ceStatusFilter">
+            <option value="succeeded">Succeeded</option>
+            <option value="succeeded,scheduled">Succeeded + Scheduled</option>
+          </select>
+        </div>
+        <div>
           <label class="label">Model</label>
           <select id="ceModel">
             <option value="claude-haiku">Claude Haiku</option>
@@ -167,6 +201,13 @@
           <select id="ceBatchSize">
             <option value="5">5 posts</option>
             <option value="8" selected>8 posts</option>
+          </select>
+        </div>
+        <div>
+          <label class="label">Link Filter</label>
+          <select id="cePostFilter">
+            <option value="with_link" selected>With TikTok Link</option>
+            <option value="all">All Posts</option>
           </select>
         </div>
       </div>
@@ -182,15 +223,22 @@
     <!-- Batch Actions -->
     <div class="card mb-md hidden" id="ceBatchActions">
       <div class="card-head">
-        <div class="card-title">Batch Actions</div>
+        <div class="card-title">Pipeline</div>
         <div class="card-sub" id="ceBatchSub"></div>
       </div>
       <div class="btn-row">
-        <button class="btn btn-p" id="ceAssignBtn" onclick="App.ceAssignArchetypes()">Assign Archetypes</button>
-        <button class="btn btn-p" id="ceGenerateBtn" onclick="App.ceGenerate()" disabled>Generate Comments</button>
-        <button class="btn btn-s" id="ceValidateBtn" onclick="App.ceValidate()" disabled>Validate All</button>
-        <button class="btn btn-g" id="ceExportBtn" onclick="App.ceExport()" disabled>Export Comments</button>
+        <button class="btn btn-p" id="ceRunPipelineBtn" onclick="App.ceRunPipeline()">Run Full Pipeline</button>
+        <button class="btn btn-g hidden" id="ceExportBtn" onclick="App.ceExport()">Export Comments</button>
+        <span id="cePipelineStatus" style="font-size:12px; color:var(--text-3); margin-left:8px;"></span>
       </div>
+    </div>
+
+    <!-- Pipeline Summary -->
+    <div class="card mb-md hidden" id="ceSummaryCard">
+      <div class="card-head">
+        <div class="card-title">Pipeline Summary</div>
+      </div>
+      <div id="ceSummaryContent"></div>
     </div>
 
     <!-- Posts with Comments -->

@@ -158,20 +158,27 @@ def get_posts(product_id, template_id, hours_back=24):
     return _enrich_posts(sb, posts)
 
 
-def get_all_posts_for_product(product_id, template_id=None, start_date=None, end_date=None):
-    """Get all succeeded slideshow posts, optionally filtered by template and date range.
+def get_all_posts_for_product(product_id, template_id=None, start_date=None, end_date=None, statuses=None):
+    """Get slideshow posts, optionally filtered by template, date range, and statuses.
     Uses created_at for time filtering."""
     sb = get_sb()
+
+    if statuses is None:
+        statuses = ["succeeded"]
 
     query = sb.table("frontend_post").select(
         "id, account_id, template_id, title, tiktok_post_id, caption, "
         "scene_data, template_data, status, post_time, num_slides, type, "
         "succeeded_at, product_id, created_at"
     ).eq("product_id", product_id
-    ).eq("status", "succeeded"
     ).eq("type", "slideshow"
     ).order("created_at", desc=True
     ).limit(200)
+
+    if len(statuses) == 1:
+        query = query.eq("status", statuses[0])
+    else:
+        query = query.in_("status", statuses)
 
     if start_date:
         query = query.gte("created_at", start_date)

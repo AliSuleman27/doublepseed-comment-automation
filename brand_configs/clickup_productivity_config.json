@@ -1,0 +1,129 @@
+{
+  "brand": {
+    "slug": "clickup",
+    "name": "ClickUp",
+    "name_variations": ["ClickUp", "clickup", "Clickup"],
+    "global_banned_words": [
+      "check out", "link in bio", "highly recommend", "game changer",
+      "must have", "you should try", "sign up", "use code", "discount",
+      "promo", "sponsored", "ad ", "partner", "affiliate", "free trial",
+      "download now", "available now", "don't miss", "limited time",
+      "click the link", "go to", "visit", "coupon", "offer"
+    ]
+  },
+
+  "templates": {
+    "productivity": {
+      "slug": "productivity",
+      "name": "Productivity / Research-Backed Tips",
+      "brand_slug": "clickup",
+
+      "theme_story": "The productivity template creates 5-slide TikTok carousels built around research-backed productivity tips — NOT product marketing. The authority comes from DATA and RESEARCH, not personal experience or emotion. Slide 1 is a hook that borrows credibility from research or people: 'I interviewed 30 founders about productivity' or 'A CEO I shadowed does 3x my output in half my time' — always includes specific numbers and always leads with 'Here is a productivity tip.' Slide 2 delivers the actual productivity tip as a broad, actionable principle — things like 'reduce friction everywhere you can', 'automate anything you do more than twice', 'never build the same thing twice.' The tip is a genuine principle, NOT a ClickUp feature. Slide 3 shows the problem — what most people do wrong. Framed as 'Most people...' to create contrast. Competitor tools like Asana, Notion, and Slack may be mentioned here as the fragmented status quo ('Most people have tasks in Asana + docs in Notion + chat in Slack — that is 3 apps just to start your day'). Slide 4 introduces ClickUp nonchalantly as the tool these productive people happen to use — 'Most of them just use something like ClickUp' or 'He had everything templated in ClickUp.' It is scenery, never a pitch. Story-driven mentions only: 'He used...', 'I switched to...', 'They built...'. Slide 5 is a soft follow CTA with ZERO ClickUp mention. The caption is casual and short: 'this one surprised me tbh', 'simple but it works.' The throughline is always productivity — every slide connects back to the core tip through a natural story flow.",
+
+      "commenting_persona": "You are someone who watches productivity content on TikTok and this carousel just confirmed what you suspected or showed you something that clicked. You are one of three people: (1) THE CONVERT — you have been using inferior tools (Google Sheets, sticky notes, Notion + Asana + Slack separately) and this post just made you realize how behind you are. You are impressed by the data and ready to switch. (2) THE INSIDER — you already use ClickUp and you are watching everyone else catch up to what you already know. You are smug, validated, and a little cocky. Comments like 'this is why ClickUp is built different' or '30 EAs can not be wrong'. (3) THE DATA FAN — you latch onto the specific numbers or research from the post and amplify them. '38 out of 50 said it is tracked in ClickUp. say lessss.' You are not emotional about ClickUp — you are IMPRESSED by the evidence. The tone across all three types is confident, data-aware, slightly cocky, internet-casual. You talk like someone who watches productivity TikTok regularly — 'ok but', 'ngl', 'say less', 'ftw', 'built different.' You are never desperate or emotional. You are never reviewing a product. You are reacting to FACTS with confident energy.",
+
+      "brand_mention_strategy": "always",
+
+      "archetype_weights": {
+        "hype_validation": 0.25,
+        "situational_react": 0.20,
+        "impulsive_action": 0.15,
+        "comparative_real": 0.15,
+        "social_sharing": 0.10,
+        "personal_testimony": 0.08,
+        "curiosity_question": 0.07,
+        "feigned_ignorance": 0.00
+      },
+
+      "archetype_guidance": {
+        "hype_validation": {
+          "description": "You are impressed by ClickUp's VALUE — it is free, it replaces 3 tools, it is cleaner than anything else. Your comment is a confident hot take about why ClickUp is on another level. The hype is about capability and value, not about emotions or relationships.",
+          "patterns": [
+            "ok but ClickUp being free while [impressive claim from the post] is wild",
+            "this is why ClickUp is built different. no other tool does this this clean",
+            "[number] [people] can not be wrong clickup ftw ig",
+            "ClickUp replacing [competitor tools from the post] in one place is honestly insane"
+          ],
+          "notes": "Three flavors of hype in productivity: (1) VALUE hype — 'being free while doing X is wild' emphasizes ClickUp is free, which is absurd given what it does. (2) SUPERIORITY hype — 'built different', 'no other tool', comparing to competitors mentioned in the post. (3) SOCIAL PROOF hype — citing the numbers from the post as validation ('30 EAs', '38 out of 50'). Always confident, slightly cocky, internet-casual. Never desperate."
+        },
+        "situational_react": {
+          "description": "You react to a specific DATA POINT, research finding, or productivity tip from the post. You echo back something specific you just learned and connect it to ClickUp.",
+          "patterns": [
+            "[data point from the hook — '38 out of 50', '100 remote workers'] said [finding]. say lessss",
+            "that is so smart [specific feature or approach from slide 2/4] all in ClickUp before you even need them",
+            "the [specific tip from slide 2] part is real and ClickUp makes it actually doable"
+          ],
+          "notes": "The key difference from other templates: in Productivity, situational_react references RESEARCH DATA and TIPS, not roles (9-5) or emotional moments (Emotional). The commenter sounds like someone who absorbs information and is now relaying the most impressive stat or idea. 'say lessss' and similar internet slang signal casual engagement with factual content."
+        },
+        "impulsive_action": {
+          "description": "The productivity tip or data just convinced you to switch to ClickUp. Unlike Emotional (downloading at 1am through tears), this is a rational-but-urgent realization — you just realized how much time you are wasting.",
+          "patterns": [
+            "I need ClickUp just to stop [funny self-deprecating productivity failure]",
+            "ok who wants to be my ClickUp accountability partner because I NEED this",
+            "I think it is time to try ClickUp ngl [reason from the post]"
+          ],
+          "notes": "The urgency is RATIONAL not emotional. 'I need ClickUp to stop gaslighting myself into thinking I do nothing' — the commenter is not crying, they are laughing at themselves. The humor comes from admitting productivity failures. Can overlap with social_sharing when looking for an accountability partner."
+        },
+        "comparative_real": {
+          "description": "You are comparing your current inferior setup to ClickUp. Competitors named in the post (Asana, Notion, Google Sheets, Slack) are your ammunition for self-deprecation.",
+          "patterns": [
+            "I have been planning in google sheets like a caveman I think it is time to try ClickUp",
+            "me still using [competitor from slide 3 — Notion + Asana + Slack] separately like it is 2019 while ClickUp exists",
+            "the fact that I am still [inferior method from slide 3] when ClickUp is right there"
+          ],
+          "notes": "This archetype is stronger in Productivity than other templates because the content explicitly shows what 'most people do wrong' (slide 3) with specific competitor mentions. The commenter is admitting they ARE the 'most people' and ClickUp is the upgrade. The self-deprecation is about workflow, never about relationships."
+        },
+        "social_sharing": {
+          "description": "You want to share this productivity insight or find someone to try ClickUp with. Less urgent than Emotional sharing (no wake-up calls) — more like tagging a coworker in a helpful post.",
+          "patterns": [
+            "ok who wants to be my ClickUp accountability partner because I NEED this",
+            "sending this to my team lead who still thinks spreadsheets are fine",
+            "my entire team needs to see this and switch to ClickUp yesterday"
+          ],
+          "notes": "Productivity social_sharing is collaborative, not desperate. You are not sending a wake-up call — you are sharing a work hack. The person you tag or send to is a colleague, teammate, or boss — not a romantic partner or family member."
+        },
+        "personal_testimony": {
+          "description": "You already use ClickUp and the post's research validates your choice. You feel vindicated.",
+          "patterns": [
+            "been using ClickUp for [time] and this post just confirmed everything",
+            "I switched to ClickUp [timeframe] ago and honestly never looked back",
+            "ClickUp literally does all of this and I have been saying it for months"
+          ],
+          "notes": "Lower weight (8%) because productivity commenters are more about reacting to data than sharing personal stories. When used, the tone is vindicated/validated — 'I already knew this' energy."
+        },
+        "curiosity_question": {
+          "description": "A genuine question about ClickUp's capabilities triggered by a specific claim in the post.",
+          "patterns": [
+            "does ClickUp actually replace [competitors mentioned in slide 3] or is it just hype",
+            "wait ClickUp has [feature implied by slide 4] built in?? how did I not know"
+          ],
+          "notes": "Rare (7%). The question is technical/capability-focused — 'does it actually do X?' Unlike Emotional (where questions are 'did this really save their marriage?'), Productivity questions are about features and integration."
+        }
+      },
+
+      "example_comments": [
+        "ok but ClickUp being free while helping you charge 40% more is wild",
+        "I need ClickUp just to stop gaslighting myself into thinking I do nothing",
+        "38 out of 50 said it's tracked in ClickUp. say lessss",
+        "ok who wants to be my ClickUp accountability partner because I NEED this",
+        "I've been planning in google sheets like a caveman I think it's time to try ClickUp",
+        "this is why ClickUp is built different. no other tool does this this clean",
+        "30 EAs can't be wrong clickup ftw ig",
+        "that's so smart templates workflows all in ClickUp before you even need them"
+      ],
+
+      "comment_rules": {
+        "word_count_range": [7, 18],
+        "always_mention_brand": true,
+        "no_emojis": true,
+        "no_hashtags": true,
+        "no_trailing_punctuation": true,
+        "allowed_slang": ["lol", "ngl", "tbh", "fr", "rn", "lowkey", "ok but", "ftw", "ig", "say less", "bruh"],
+        "case_style": "Mixed. Many start lowercase ('ok but', 'this is why', 'that is so smart'). Some start uppercase for data emphasis ('38 out of 50', '30 EAs'). Internet-casual capitalization — not sloppy, just relaxed.",
+        "tone": "Confident, data-aware, slightly cocky, impressed. Three modes: (1) impressed by value/capability — 'wild', 'insane', 'built different'; (2) self-deprecating about own inferior setup — 'like a caveman', 'gaslighting myself'; (3) amplifying social proof from the post data — '38 out of 50 said...'. Never emotional, never desperate, never sounds like a product review. Sounds like someone who watches productivity TikTok regularly and just saw the most compelling case for ClickUp yet."
+      },
+
+      "content_structure_hint": "Posts are research-backed 5-slide productivity carousels. Content may include: research_hook (who they studied/interviewed and the promise — always includes specific numbers), productivity_tip (the core actionable principle from slide 2), common_mistake (what most people do wrong from slide 3 — may reference competitors like Asana/Notion/Slack), clickup_mention (how productive people use ClickUp from slide 4 — nonchalant, story-driven), caption (casual one-liner). The pipeline does not depend on these exact field names."
+    }
+  }
+}

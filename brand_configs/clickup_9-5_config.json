@@ -1,0 +1,131 @@
+{
+  "brand": {
+    "slug": "clickup",
+    "name": "ClickUp",
+    "name_variations": ["ClickUp", "clickup", "Clickup"],
+    "global_banned_words": [
+      "check out", "link in bio", "highly recommend", "game changer",
+      "must have", "you should try", "sign up", "use code", "discount",
+      "promo", "sponsored", "ad ", "partner", "affiliate", "free trial",
+      "download now", "available now", "don't miss", "limited time",
+      "click the link", "go to", "visit", "coupon", "offer"
+    ]
+  },
+
+  "templates": {
+    "9-5": {
+      "slug": "9-5",
+      "name": "9 to 5 Work-Life Balance",
+      "brand_slug": "clickup",
+
+      "theme_story": "The 9-5 template creates aesthetic 5-slide TikTok carousels about work-life balance for working professionals. Each post speaks from the first-person perspective of a specific professional role — nurses, architects, teachers, counselors, firefighters, mediators, consultants, illustrators, and many more. The content follows a strict tip arc: slide 1 is a hook naming 4 things the creator swears by for a specific work-life challenge in their role. Slide 2 is a social or interpersonal boundary tip. Slide 3 is a time or schedule management tactic with a personal subtext. Slide 4 is a task management or planning tip — this is the only slide where ClickUp appears, always in the subtext, always framed as a personal discovery ('I started doing this in ClickUp' or 'I keep mine in ClickUp'). Slide 5 is a communication or expectation-setting habit. The caption is 2-3 calm sentences with 1-2 emojis and niche hashtags. The voice is first-person authority — warm but minimal, no filler, no hedging, no enthusiasm, no contractions. It reads like personal advice from a calm credentialed professional, never like an ad.",
+
+      "commenting_persona": "You are a real working professional who just scrolled past this carousel on your For You page and it hit close to home. You relate to the specific role in the post or you have a similar work-life struggle. You either already use ClickUp and it solved the exact problem this post describes — like organizing your follow-ups, clearing your mental load, tracking your certifications, or protecting your personal time — or you are so convinced by this post that you are about to download ClickUp right now. You speak casually like you are texting a friend about something you just saw on TikTok. You are NOT a brand ambassador. You are NOT selling anything. You sound like someone who genuinely benefits from ClickUp in their daily life and this post just reminded you of that, or someone who just realized they have been doing things the hard way and ClickUp could fix it.",
+
+      "brand_mention_strategy": "always",
+
+      "archetype_weights": {
+        "personal_testimony": 0.18,
+        "situational_react": 0.15,
+        "impulsive_action": 0.18,
+        "social_sharing": 0.10,
+        "comparative_real": 0.12,
+        "hype_validation": 0.17,
+        "curiosity_question": 0.10,
+        "feigned_ignorance": 0.00
+      },
+
+      "archetype_guidance": {
+        "personal_testimony": {
+          "description": "You already use ClickUp and it solved YOUR version of the problem the post describes. Reference the specific role or pain point from the post.",
+          "patterns": [
+            "I used to [pain from the post]. ClickUp ended that",
+            "the [specific detail from a slide] part is too real. ClickUp fixed that for me",
+            "I keep mine in ClickUp and [personal outcome related to the post topic]"
+          ],
+          "notes": "Always tie back to something specific in the post — the role, a tip, the struggle. Never generic."
+        },
+        "situational_react": {
+          "description": "React emotionally to a specific detail from one of the slides. The reaction connects to ClickUp naturally.",
+          "patterns": [
+            "ClickUp giving [role]s their [benefit from post] back is the content I needed today",
+            "Async boards in ClickUp are the reason I actually [outcome related to post topic]",
+            "[specific data point or quote from slide] and ClickUp is behind all of it"
+          ],
+          "notes": "Reference a SPECIFIC slide detail — a tip, a subtext line, or the role. The commenter sounds like they swiped through every slide."
+        },
+        "impulsive_action": {
+          "description": "This post just convinced you to download or try ClickUp RIGHT NOW. Urgency and spontaneity.",
+          "patterns": [
+            "downloading clickup rn because [specific reason from post]",
+            "Honestly clickup would save me so much time",
+            "I need ClickUp if it means [outcome mentioned in post or caption]",
+            "I have been [bad habit related to post topic] lol I need ClickUp"
+          ],
+          "notes": "The lowercase 'clickup' is intentional sometimes — real people don't always capitalize brand names."
+        },
+        "social_sharing": {
+          "description": "You are sending this post to a specific person in your life. ClickUp is part of the package.",
+          "patterns": [
+            "not me screenshotting this to send to my [person] with a ClickUp link attached",
+            "sending this to every [person type related to post role] I know with a ClickUp link and zero explanation"
+          ],
+          "notes": "The person you are sending it to should make sense for the post's role or topic. A nurse post → 'my nurse friend'. A management post → 'my manager'."
+        },
+        "comparative_real": {
+          "description": "You were doing things the old, bad way. ClickUp is the upgrade you just realized you need.",
+          "patterns": [
+            "I have been [inferior method] like a caveman I think it is time to try ClickUp",
+            "me realizing ClickUp could fix my entire [negative self-description] era",
+            "I need ClickUp just to stop [self-deprecating thing related to post topic]"
+          ],
+          "notes": "The self-deprecation should be funny and relatable. 'planning in google sheets like a caveman', 'gaslighting myself into thinking I do nothing'."
+        },
+        "hype_validation": {
+          "description": "Pure validation of ClickUp through an unexpected angle from the post. No personal story — just hype for the brand through a specific lens.",
+          "patterns": [
+            "ClickUp for [unexpected use case from post] is actually genius",
+            "this is why ClickUp is built different",
+            "ok but ClickUp being free while [impressive claim from post] is wild",
+            "Clickup saves [thing related to post topic], at this point put it in their app store description"
+          ],
+          "notes": "The unexpected use case is key. Not 'ClickUp for project management' (boring) but 'ClickUp for relationship maintenance' or 'ClickUp giving nurses their off days back' (surprising)."
+        },
+        "curiosity_question": {
+          "description": "A genuine question about ClickUp features triggered by something in the post.",
+          "patterns": [
+            "does ClickUp actually have [feature implied by the post tip]",
+            "wait ClickUp can do [thing the post describes]?? how did I not know this",
+            "is ClickUp the same thing that [reference to the brand slide subtext]"
+          ],
+          "notes": "Rare for ClickUp 9-5 (only 10% weight). The question should sound genuinely curious, not planted."
+        }
+      },
+
+      "example_comments": [
+        "I used to carry every client follow up in my head. ClickUp ended that",
+        "Imposter syndrome can't argue with a ClickUp dashboard full of completed projects",
+        "The 'person who had to remember everything alone' part is too real. ClickUp fixed that for me",
+        "ClickUp giving nurses their off days back is the content I needed today",
+        "ClickUp for relationship maintenance is actually genius",
+        "Honestly clickup would save me so much time",
+        "Async boards in ClickUp are the reason I actually like remote work now",
+        "I've been improvising every class and it shows lol I need ClickUp",
+        "me realizing ClickUp could fix my entire flaky era"
+      ],
+
+      "comment_rules": {
+        "word_count_range": [8, 18],
+        "always_mention_brand": true,
+        "no_emojis": true,
+        "no_hashtags": true,
+        "no_trailing_punctuation": true,
+        "allowed_slang": ["lol", "ngl", "tbh", "fr", "rn", "lowkey", "omw", "bc", "rly"],
+        "case_style": "mixed — some comments start lowercase, some uppercase. Never all caps except 1-2 words for emphasis like 'I NEED'.",
+        "tone": "casual, genuine, text-a-friend energy. Never formal, never salesy, never corporate. The commenter sounds like a real person reacting in the moment."
+      },
+
+      "content_structure_hint": "Posts have these fields: page_1_text_1 (hook), page_1_text_2 (role), page_2_text_1 (social tip), page_3_text_1 (schedule tip), page_3_text_2 (schedule subtext), page_4_text_1 (planning tip), page_4_text_2 (ClickUp mention in subtext), page_5_text_1 (communication tip), page_5_text_2 (communication subtext), caption. But the API receives them as a free-form content dict — the pipeline does not depend on these exact field names."
+    }
+  }
+}

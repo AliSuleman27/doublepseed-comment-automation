@@ -70,7 +70,9 @@ html,body { height:100%; font-family:var(--sans); background:var(--bg-1); color:
 .mt-md { margin-top:14px; }
 
 .g4-controls { display:grid; grid-template-columns:1fr 1fr 150px 150px; gap:12px; }
-.g5-controls { display:grid; grid-template-columns:1fr 1fr 140px 160px 100px; gap:12px; }
+.g5-controls { display:grid; grid-template-columns:1fr 1fr 140px 140px 140px; gap:12px; }
+.g6-controls { display:grid; grid-template-columns:1fr 1fr 140px 140px 160px 140px; gap:12px; }
+.ce-controls-grid { display:grid; grid-template-columns:1fr 1fr 140px 160px 160px 100px 140px; gap:12px; }
 .g4 { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
 .g5 { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; }
 
@@ -222,9 +224,6 @@ input[type="date"] { color-scheme: dark; }
   color:var(--text-3); margin-bottom:6px;
   display:flex; align-items:center; justify-content:space-between;
 }
-.ce-comment-text {
-  font-size:14px; color:var(--text-1); line-height:1.5; font-style:italic;
-}
 .ce-comment-placeholder {
   font-size:13px; color:var(--text-3); font-style:italic;
 }
@@ -251,6 +250,47 @@ input[type="date"] { color-scheme: dark; }
   font-size:11px; font-weight:700; font-family:var(--mono);
   color:var(--accent); background:var(--accent-dim);
   padding:4px 12px; border-radius:6px; white-space:nowrap;
+}
+
+/* ─── Editable Comment ─────────────────── */
+.ce-comment-text {
+  font-size:14px; color:var(--text-1); line-height:1.5; font-style:italic;
+}
+.ce-comment-actions {
+  display:flex; gap:6px; margin-top:8px;
+}
+.ce-edit-btn {
+  padding:3px 10px; border-radius:5px; border:1px solid var(--border);
+  background:var(--bg-4); color:var(--text-3); font-size:11px; font-weight:600;
+  font-family:var(--mono); cursor:pointer; transition:.15s;
+}
+.ce-edit-btn:hover { border-color:var(--accent); color:var(--accent); }
+.ce-edit-btn.save { border-color:var(--green); color:var(--green); }
+.ce-edit-btn.save:hover { background:var(--green-dim); }
+.ce-edit-btn.cancel { border-color:var(--red); color:var(--red); }
+.ce-edit-btn.cancel:hover { background:var(--red-dim); }
+
+.ce-comment-edit {
+  width:100%; padding:8px 10px; border-radius:6px; border:1px solid var(--accent);
+  background:var(--bg-1); color:var(--text-1); font-size:14px; font-family:var(--sans);
+  font-style:italic; line-height:1.5; resize:vertical; outline:none;
+  min-height:40px;
+}
+.ce-comment-edit:focus { box-shadow:0 0 0 2px var(--accent-dim); }
+
+.ce-comment-wc {
+  font-size:10px; color:var(--text-3); font-family:var(--mono); margin-top:4px;
+}
+
+/* ─── Status badge in post cards ─────────────────── */
+.post-status-scheduled {
+  color:var(--orange); background:var(--orange-dim);
+}
+
+/* ─── Batch progress indicator ─────────────────── */
+.batch-processing {
+  border-color:var(--orange) !important;
+  box-shadow: 0 0 0 1px var(--orange-dim);
 }
 
 /* ─── Animations ─────────────────── */

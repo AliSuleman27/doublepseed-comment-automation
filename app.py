@@ -6,10 +6,11 @@ Flow:
   2. Pick template → fetches succeeded posts (last N hours)
   3. View posts: tiktok link, slide texts, caption, account
   4. Export as CSV
+  5. Comment Engine: upload config → generate AI comments → validate → export
 """
-import os, sys, csv, io
+import os, sys, csv, io, json, traceback
 from datetime import datetime
-from flask import Flask, render_template, request, jsonify, Response
+from flask import Flask, render_template, request, jsonify, Response, stream_with_context
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -20,10 +21,13 @@ from services.supabase_adapter import (
     get_templates_for_product, get_accounts_for_product,
     get_all_posts_for_product, test_connection,
 )
+from services.comment_engine import run_pipeline, prepare_pipeline, process_batch
 
 app = Flask(__name__)
 
 _session = {"product_id": None, "template_id": None, "posts": []}
+_ce_config = {}  # Uploaded brand+template config
+_ce_prep = {}    # Prepared pipeline state for batch streaming
 
 
 @app.route("/")
@@ -34,15 +38,13 @@ def index():
 
 @app.route("/api/test")
 def api_test():
-    """Diagnostic endpoint to test Supabase connection."""
     return jsonify(test_connection())
 
 
 @app.route("/api/products")
 def api_products():
     try:
-        products = get_products()
-        return jsonify(products)
+        return jsonify(get_products())
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -50,8 +52,7 @@ def api_products():
 @app.route("/api/products/<product_id>/templates")
 def api_templates(product_id):
     try:
-        templates = get_templates_for_product(product_id)
-        return jsonify(templates)
+        return jsonify(get_templates_for_product(product_id))
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -59,8 +60,7 @@ def api_templates(product_id):
 @app.route("/api/products/<product_id>/accounts")
 def api_accounts(product_id):
     try:
-        accounts = get_accounts_for_product(product_id)
-        return jsonify(accounts)
+        return jsonify(get_accounts_for_product(product_id))
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -72,12 +72,13 @@ def api_fetch_posts():
     template_id = data.get("template_id")
     start_date = data.get("start_date")
     end_date = data.get("end_date")
+    statuses = data.get("statuses", ["succeeded"])
 
     if not product_id:
         return jsonify({"error": "product_id required"}), 400
 
     try:
-        posts = get_all_posts_for_product(product_id, template_id, start_date, end_date)
+        posts = get_all_posts_for_product(product_id, template_id, start_date, end_date, statuses=statuses)
     except Exception as e:
         return jsonify({"error": f"Database error: {str(e)}"}), 500
 
@@ -106,10 +107,7 @@ def api_fetch_posts():
             "status": p.get("status"),
         })
 
-    return jsonify({
-        "posts": results,
-        "count": len(results),
-    })
+    return jsonify({"posts": results, "count": len(results)})
 
 
 @app.route("/api/posts/export", methods=["POST"])
@@ -138,8 +136,187 @@ def api_export():
                     headers={"Content-Disposition": f"attachment; filename={filename}"})
 
 
+# ═══════════════════════════════════════════════
+# COMMENT ENGINE API
+# ═══════════════════════════════════════════════
+
+@app.route("/api/ce/config", methods=["POST"])
+def api_ce_upload_config():
+    """Upload brand+template config JSON."""
+    try:
+        if request.content_type and "multipart" in request.content_type:
+            f = request.files.get("config")
+            if not f:
+                return jsonify({"error": "No file uploaded"}), 400
+            raw = f.read().decode("utf-8")
+            config = json.loads(raw)
+        else:
+            config = request.json
+
+        if not config:
+            return jsonify({"error": "Empty config"}), 400
+
+        # Validate structure
+        if "brand" not in config or "templates" not in config:
+            return jsonify({"error": "Config must have 'brand' and 'templates' keys"}), 400
+
+        _ce_config.clear()
+        _ce_config.update(config)
+
+        template_names = list(config["templates"].keys())
+        return jsonify({
+            "ok": True,
+            "brand": config["brand"].get("name", "unknown"),
+            "templates": template_names,
+        })
+    except json.JSONDecodeError as e:
+        return jsonify({"error": f"Invalid JSON: {str(e)}"}), 400
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/ce/config", methods=["GET"])
+def api_ce_get_config():
+    """Get the currently loaded config."""
+    if not _ce_config:
+        return jsonify({"loaded": False})
+    return jsonify({
+        "loaded": True,
+        "brand": _ce_config.get("brand", {}).get("name", "unknown"),
+        "templates": list(_ce_config.get("templates", {}).keys()),
+    })
+
+
+@app.route("/api/ce/generate", methods=["POST"])
+def api_ce_generate():
+    """Run the full comment generation pipeline.
+
+    Body: {
+        "posts": [...],           // posts with tiktok links
+        "template_slug": "9-5",   // which template config to use
+        "model": "claude-haiku",  // LLM model
+        "batch_size": 8           // posts per batch
+    }
+    """
+    if not _ce_config:
+        return jsonify({"error": "No config uploaded. Upload a brand config first."}), 400
+
+    data = request.json
+    posts = data.get("posts", [])
+    template_slug = data.get("template_slug", "")
+    model = data.get("model", "claude-haiku")
+    batch_size = data.get("batch_size", 8)
+
+    if not posts:
+        return jsonify({"error": "No posts provided"}), 400
+
+    brand_config = _ce_config.get("brand", {})
+    templates = _ce_config.get("templates", {})
+
+    # Find matching template config
+    template_config = templates.get(template_slug)
+    if not template_config:
+        # Try fuzzy match
+        for slug, tc in templates.items():
+            if slug in template_slug or template_slug in slug:
+                template_config = tc
+                break
+    if not template_config:
+        # Use first template as fallback
+        template_config = next(iter(templates.values())) if templates else {}
+
+    if not template_config:
+        return jsonify({"error": f"No template config found for '{template_slug}'"}), 400
+
+    try:
+        result = run_pipeline(
+            posts=posts,
+            brand_config=brand_config,
+            template_config=template_config,
+            model=model,
+            batch_size=batch_size,
+        )
+        return jsonify(result)
+    except Exception as e:
+        tb = traceback.format_exc()
+        print(f"[CE] Pipeline error: {e}\n{tb}")
+        return jsonify({"error": f"Pipeline error: {str(e)}"}), 500
+
+
+@app.route("/api/ce/prepare", methods=["POST"])
+def api_ce_prepare():
+    """Prepare the pipeline: assign archetypes, build prompts, create batches.
+    Returns batch count and assignments so frontend can call /api/ce/batch/<n>.
+    """
+    if not _ce_config:
+        return jsonify({"error": "No config uploaded. Upload a brand config first."}), 400
+
+    data = request.json
+    posts = data.get("posts", [])
+    template_slug = data.get("template_slug", "")
+    model = data.get("model", "claude-haiku")
+    batch_size = data.get("batch_size", 8)
+
+    if not posts:
+        return jsonify({"error": "No posts provided"}), 400
+
+    brand_config = _ce_config.get("brand", {})
+    templates = _ce_config.get("templates", {})
+
+    template_config = templates.get(template_slug)
+    if not template_config:
+        for slug, tc in templates.items():
+            if slug in template_slug or template_slug in slug:
+                template_config = tc
+                break
+    if not template_config:
+        template_config = next(iter(templates.values())) if templates else {}
+    if not template_config:
+        return jsonify({"error": f"No template config found for '{template_slug}'"}), 400
+
+    try:
+        prep = prepare_pipeline(
+            posts=posts,
+            brand_config=brand_config,
+            template_config=template_config,
+            model=model,
+            batch_size=batch_size,
+        )
+        _ce_prep.clear()
+        _ce_prep.update(prep)
+
+        return jsonify({
+            "ok": True,
+            "total_batches": len(prep["batches"]),
+            "total_posts": len(posts),
+            "assignments": prep["assignments"],
+        })
+    except Exception as e:
+        tb = traceback.format_exc()
+        print(f"[CE] Prepare error: {e}\n{tb}")
+        return jsonify({"error": f"Prepare error: {str(e)}"}), 500
+
+
+@app.route("/api/ce/batch/<int:batch_idx>", methods=["POST"])
+def api_ce_process_batch(batch_idx):
+    """Process a single batch and return its results."""
+    if not _ce_prep:
+        return jsonify({"error": "Pipeline not prepared. Call /api/ce/prepare first."}), 400
+
+    total_batches = len(_ce_prep.get("batches", []))
+    if batch_idx < 0 or batch_idx >= total_batches:
+        return jsonify({"error": f"Invalid batch index {batch_idx}. Total batches: {total_batches}"}), 400
+
+    try:
+        result = process_batch(_ce_prep, batch_idx)
+        return jsonify(result)
+    except Exception as e:
+        tb = traceback.format_exc()
+        print(f"[CE] Batch {batch_idx} error: {e}\n{tb}")
+        return jsonify({"error": f"Batch error: {str(e)}"}), 500
+
+
 if __name__ == "__main__":
-    # Run connection test at startup
     diag = test_connection()
     if diag["ok"]:
         print(f"\n  ✓ Supabase connected (role={diag['role']})\n")
