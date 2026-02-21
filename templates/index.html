@@ -9,7 +9,33 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-<div class="shell">
+
+<!-- Login Screen -->
+<div id="loginScreen" class="login-screen">
+  <div class="login-card">
+    <div class="login-brand">
+      <img src="https://app.doublespeed.ai/ds.ico" alt="DS" class="brand-logo">
+      <span>doublespeed</span>
+    </div>
+    <div class="login-title">Sign in to Post Viewer</div>
+    <div class="login-form">
+      <div>
+        <label class="label">Email</label>
+        <input type="email" id="loginEmail" class="input" placeholder="you@example.com"
+               onkeydown="if(event.key==='Enter') document.getElementById('loginPassword').focus()">
+      </div>
+      <div>
+        <label class="label">Password</label>
+        <input type="password" id="loginPassword" class="input" placeholder="Password"
+               onkeydown="if(event.key==='Enter') App.login()">
+      </div>
+      <div id="loginError" class="login-error hidden"></div>
+      <button class="btn btn-p login-btn" id="loginBtn" onclick="App.login()">Sign In</button>
+    </div>
+  </div>
+</div>
+
+<div class="shell hidden" id="appShell">
 
   <div class="topbar">
     <div class="brand">
@@ -21,6 +47,10 @@
       <button class="tab-btn" data-tab="comments" onclick="App.switchTab('comments')">Comment Engine</button>
     </div>
     <div class="topbar-right">
+      <div class="user-info hidden" id="userInfo">
+        <span class="user-email" id="userEmail"></span>
+        <button class="btn btn-s btn-sm" onclick="App.logout()">Logout</button>
+      </div>
       <div class="status-badge">
         <div class="status-dot" id="statusDot"></div>
         <span id="statusText">Loading...</span>
@@ -311,6 +341,7 @@
       </div>
       <div class="btn-row">
         <button class="btn btn-p" id="ceRunPipelineBtn" onclick="App.ceRunPipeline()">Run Full Pipeline</button>
+        <button class="btn btn-s" onclick="App.ceRunTestPipeline()">Test Pipeline</button>
         <button class="btn btn-g hidden" id="ceExportBtn" onclick="App.ceExport()">Export Comments</button>
         <span id="cePipelineStatus" style="font-size:12px; color:var(--text-3); margin-left:8px;"></span>
       </div>

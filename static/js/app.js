@@ -16,6 +16,11 @@ const App = {
   selectedProduct: null,
   selectedTemplate: null,
 
+  // Auth state
+  authToken: null,
+  refreshToken: null,
+  userEmail: null,
+
   // Comment engine state
   cePosts: [],
   ceResults: [],
@@ -29,8 +34,37 @@ const App = {
   ceFilterMode: 'all',      // 'all' | 'fallback' | 'flagged' | 'pass'
 
   async init() {
-    console.log('[DS] init');
+    console.log('[DS] init — checking auth');
+    this.authToken = localStorage.getItem('ds_auth_token');
+    this.refreshToken = localStorage.getItem('ds_auth_refresh');
 
+    if (this.authToken) {
+      const valid = await this.verifyAuth();
+      if (valid) { this.showApp(); return; }
+      if (this.refreshToken) {
+        const refreshed = await this.tryRefresh();
+        if (refreshed) { this.showApp(); return; }
+      }
+    }
+    this.showLogin();
+  },
+
+  // ─── Auth ─────────────────────────────
+  showLogin() {
+    document.getElementById('loginScreen').classList.remove('hidden');
+    document.getElementById('appShell').classList.add('hidden');
+    document.getElementById('userInfo').classList.add('hidden');
+  },
+
+  async showApp() {
+    document.getElementById('loginScreen').classList.add('hidden');
+    document.getElementById('appShell').classList.remove('hidden');
+    document.getElementById('userInfo').classList.remove('hidden');
+    document.getElementById('userEmail').textContent = this.userEmail || '';
+    await this.initApp();
+  },
+
+  async initApp() {
     const today = new Date();
     const yesterday = new Date(today);
     yesterday.setDate(yesterday.getDate() - 1);
@@ -38,16 +72,7 @@ const App = {
     document.getElementById('endDate').value = this.formatDate(today);
     document.getElementById('ceDate').value = this.formatDate(yesterday);
 
-    const sidebarItems = document.querySelectorAll('.sb-item[data-pid]');
-    if (sidebarItems.length > 0) {
-      this.products = Array.from(sidebarItems).map(el => ({
-        id: el.dataset.pid,
-        title: el.querySelector('span:last-child').textContent.trim()
-      }));
-      this.setStatus('ready');
-    } else {
-      await this.loadProducts();
-    }
+    await this.loadProducts();
 
     const lastPid = localStorage.getItem('ds_product');
     const lastTid = localStorage.getItem('ds_template');
@@ -65,8 +90,121 @@ const App = {
       }
     }
 
-    // Check if config already loaded on server
     this.ceCheckConfig();
+  },
+
+  async verifyAuth() {
+    try {
+      const res = await fetch('/api/auth/me', {
+        headers: { 'Authorization': 'Bearer ' + this.authToken }
+      });
+      if (!res.ok) return false;
+      const data = await res.json();
+      if (data.user) { this.userEmail = data.user.email; return true; }
+      return false;
+    } catch (e) { return false; }
+  },
+
+  async tryRefresh() {
+    try {
+      const res = await fetch('/api/auth/refresh', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refresh_token: this.refreshToken }),
+      });
+      if (!res.ok) return false;
+      const data = await res.json();
+      if (data.access_token) {
+        this.authToken = data.access_token;
+        this.refreshToken = data.refresh_token || this.refreshToken;
+        localStorage.setItem('ds_auth_token', this.authToken);
+        if (data.refresh_token) localStorage.setItem('ds_auth_refresh', data.refresh_token);
+        return await this.verifyAuth();
+      }
+      return false;
+    } catch (e) { return false; }
+  },
+
+  async login() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    const errorEl = document.getElementById('loginError');
+    const btn = document.getElementById('loginBtn');
+
+    if (!email || !password) {
+      errorEl.textContent = 'Please enter email and password';
+      errorEl.classList.remove('hidden');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Signing in...';
+    errorEl.classList.add('hidden');
+
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json();
+
+      if (!res.ok || data.error) {
+        errorEl.textContent = data.error || 'Login failed';
+        errorEl.classList.remove('hidden');
+        btn.disabled = false; btn.textContent = 'Sign In';
+        return;
+      }
+
+      if (data.access_token) {
+        this.authToken = data.access_token;
+        this.refreshToken = data.refresh_token;
+        this.userEmail = data.user?.email || email;
+        localStorage.setItem('ds_auth_token', data.access_token);
+        localStorage.setItem('ds_auth_refresh', data.refresh_token);
+        this.showApp();
+      } else {
+        errorEl.textContent = data.message || 'Login failed: no token returned';
+        errorEl.classList.remove('hidden');
+      }
+    } catch (e) {
+      errorEl.textContent = 'Connection error: ' + e.message;
+      errorEl.classList.remove('hidden');
+    }
+    btn.disabled = false; btn.textContent = 'Sign In';
+  },
+
+  logout() {
+    if (this.authToken) {
+      fetch('/api/auth/logout', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + this.authToken },
+      }).catch(() => {});
+    }
+    this.authToken = null;
+    this.refreshToken = null;
+    this.userEmail = null;
+    localStorage.removeItem('ds_auth_token');
+    localStorage.removeItem('ds_auth_refresh');
+    this.showLogin();
+  },
+
+  async authFetch(url, options = {}) {
+    if (!options.headers) options.headers = {};
+    if (this.authToken && !options.headers['Authorization']) {
+      options.headers['Authorization'] = 'Bearer ' + this.authToken;
+    }
+    const res = await fetch(url, options);
+    if (res.status === 401 && this.refreshToken) {
+      const refreshed = await this.tryRefresh();
+      if (refreshed) {
+        options.headers['Authorization'] = 'Bearer ' + this.authToken;
+        return fetch(url, options);
+      }
+      this.logout();
+      throw new Error('Session expired. Please log in again.');
+    }
+    return res;
   },
 
   formatDate(date) { return date.toISOString().split('T')[0]; },
@@ -86,7 +224,7 @@ const App = {
   async loadProducts() {
     this.setStatus('loading');
     try {
-      const res = await fetch('/api/products');
+      const res = await this.authFetch('/api/products');
       const data = await res.json();
       if (data.error) { this.showWarning(data.error); this.setStatus('error'); return; }
       if (Array.isArray(data) && data.length > 0) {
@@ -95,7 +233,7 @@ const App = {
         this.renderProductDropdown(data);
         this.setStatus('ready');
       } else {
-        const testRes = await fetch('/api/test');
+        const testRes = await this.authFetch('/api/test');
         const diag = await testRes.json();
         this.showWarning(diag.ok ? 'No managed clients found.' : diag.message);
         this.setStatus('error');
@@ -160,7 +298,7 @@ const App = {
     tsel.innerHTML = '<option value="">Loading templates...</option>';
     tsel.disabled = true; fetchBtn.disabled = true;
     try {
-      const res = await fetch(`/api/products/${productId}/templates`);
+      const res = await this.authFetch(`/api/products/${productId}/templates`);
       const data = await res.json();
       if (data.error) { tsel.innerHTML = '<option value="">Error</option>'; return; }
       this.templates[productId] = data;
@@ -201,7 +339,7 @@ const App = {
       const body = { product_id: pid, template_id: tid, statuses };
       if (startDate) body.start_date = startDate + 'T00:00:00Z';
       if (endDate) body.end_date = endDate + 'T23:59:59Z';
-      const res = await fetch('/api/posts/fetch', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      const res = await this.authFetch('/api/posts/fetch', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
       const data = await res.json();
       if (data.error) { document.getElementById('fetchStatus').textContent = data.error; this.setStatus('error'); return; }
 
@@ -263,7 +401,7 @@ const App = {
 
   async exportCSV() {
     try {
-      const res = await fetch('/api/posts/export', { method: 'POST' });
+      const res = await this.authFetch('/api/posts/export', { method: 'POST' });
       const blob = await res.blob();
       const cd = res.headers.get('Content-Disposition') || '';
       const match = cd.match(/filename=(.+)/);
@@ -279,7 +417,7 @@ const App = {
   // ─── Config Upload ────────────────────────────
   async ceCheckConfig() {
     try {
-      const res = await fetch('/api/ce/config');
+      const res = await this.authFetch('/api/ce/config');
       const data = await res.json();
       if (data.loaded) {
         this.ceConfigLoaded = true;
@@ -303,7 +441,7 @@ const App = {
     formData.append('config', file);
 
     try {
-      const res = await fetch('/api/ce/config', { method: 'POST', body: formData });
+      const res = await this.authFetch('/api/ce/config', { method: 'POST', body: formData });
       const data = await res.json();
       if (data.error) { info.textContent = 'Error: ' + data.error; info.style.color = 'var(--red)'; return; }
 
@@ -341,7 +479,7 @@ const App = {
     if (this.templates[productId]) { this.ceRenderTemplateDropdown(this.templates[productId]); return; }
     tsel.innerHTML = '<option value="">Loading...</option>'; tsel.disabled = true;
     try {
-      const res = await fetch(`/api/products/${productId}/templates`);
+      const res = await this.authFetch(`/api/products/${productId}/templates`);
       const data = await res.json();
       if (data.error) { tsel.innerHTML = '<option value="">Error</option>'; return; }
       this.templates[productId] = data;
@@ -384,7 +522,7 @@ const App = {
       }
       if (!templateSlug && this.ceConfigTemplates.length > 0) templateSlug = this.ceConfigTemplates[0];
 
-      const res = await fetch(`/api/ce/config/detail?template_slug=${encodeURIComponent(templateSlug)}`);
+      const res = await this.authFetch(`/api/ce/config/detail?template_slug=${encodeURIComponent(templateSlug)}`);
       const data = await res.json();
       if (!data.loaded) return;
 
@@ -501,7 +639,7 @@ const App = {
       const body = { product_id: pid, template_id: tid, statuses };
       if (date) { body.start_date = date + 'T00:00:00Z'; body.end_date = date + 'T23:59:59Z'; }
 
-      const res = await fetch('/api/posts/fetch', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      const res = await this.authFetch('/api/posts/fetch', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
       const data = await res.json();
       if (data.error) { document.getElementById('ceLoadStatus').textContent = data.error; this.setStatus('error'); return; }
 
@@ -613,7 +751,7 @@ const App = {
 
     let prepData;
     try {
-      const prepRes = await fetch('/api/ce/prepare', {
+      const prepRes = await this.authFetch('/api/ce/prepare', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -671,7 +809,7 @@ const App = {
       this._ceHighlightBatch(bi, batchSize, true);
 
       try {
-        const batchRes = await fetch(`/api/ce/batch/${bi}`, {
+        const batchRes = await this.authFetch(`/api/ce/batch/${bi}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
         });
@@ -729,6 +867,211 @@ const App = {
     btn.disabled = false;
     btn.textContent = 'Run Full Pipeline';
     btn.classList.remove('generating');
+  },
+
+  // ─── Test Pipeline (mock data, no LLM) ────────────────
+  ceRunTestPipeline() {
+    if (!this.cePosts.length) {
+      const status = document.getElementById('cePipelineStatus');
+      status.textContent = 'Load posts first!';
+      status.style.color = 'var(--red)';
+      return;
+    }
+
+    const archetypeKeys = Object.keys(ARCHETYPES);
+    const mockComments = [
+      "clickup literally saved my workflow last week ngl",
+      "wait this is actually how I plan my entire week now",
+      "my manager would lose it if she saw how organized this is",
+      "ok but why does this look exactly like my to-do list rn",
+      "been using this for 3 months and honestly can't go back",
+      "this is giving productive era and I'm here for it",
+      "someone tell my coworker about this before I lose my mind",
+      "the way I just reorganized my whole life in 20 minutes",
+      "not me watching this at 2am instead of actually being productive",
+      "I showed this to my team and now everyone's obsessed",
+      "can someone drop the app name bc I need this immediately",
+      "what app is that I keep seeing it everywhere",
+      "this the kind of organization I pretend to have",
+      "lowkey need this for my side project asap",
+      "my brain just went from chaos to clarity watching this",
+      "Clickup making project management look effortless honestly",
+      "why did nobody tell me about this sooner genuinely asking",
+      "this is exactly what our team needed for sprint planning",
+      "the dashboard view alone is worth it not even joking",
+      "ok I'm convinced where do I sign up",
+      "this gave me the motivation to finally organize my tasks",
+      "been looking for something like this for months wow",
+      "the way this just simplified my entire morning routine",
+      "clickup really said let me fix your whole workflow huh",
+    ];
+
+    const flaggedComments = [
+      "OMG this is literally the BEST app I've ever seen!!!",
+      "clickup is honestly just so amazing and wonderful and great for productivity",
+      "this tool is a game changer for real like no cap it changed everything",
+      "I need this. I want this. I have to get this app right now.",
+    ];
+
+    const fallbackComments = [
+      "can someone tell me what app this is",
+      "what's the app at the end asking for a friend",
+      "ok but drop the link please",
+      "this is the energy I needed today honestly",
+    ];
+
+    const passChecks = [
+      { label: 'No emoji', status: 'pass' },
+      { label: 'No hashtags', status: 'pass' },
+      { label: 'No ad language', status: 'pass' },
+      { label: 'No banned patterns', status: 'pass' },
+    ];
+
+    const posts = this.cePosts;
+    const assignments = [];
+    const relevanceTags = {};
+    const results = [];
+
+    posts.forEach((p, i) => {
+      const arch = archetypeKeys[Math.floor(Math.random() * archetypeKeys.length)];
+      const brandMention = arch !== 'feigned_ignorance' && Math.random() > 0.3;
+      const relTag = Math.random() > 0.5 ? 'specific' : 'vibe';
+
+      assignments.push({ post_id: p.id, archetype: arch, brand_mention: brandMention });
+      relevanceTags[p.id] = relTag;
+
+      // Decide status: ~60% pass, ~20% flagged, ~20% fallback
+      const roll = Math.random();
+      let status, source, comment, checks;
+
+      if (roll < 0.6) {
+        status = 'pass';
+        source = 'llm';
+        comment = mockComments[Math.floor(Math.random() * mockComments.length)];
+        const wc = comment.split(/\s+/).length;
+        checks = [
+          ...passChecks,
+          { label: `${wc} words`, status: 'pass' },
+          { label: brandMention ? 'Brand mentioned' : 'No brand (mystery)', status: 'pass' },
+        ];
+      } else if (roll < 0.8) {
+        status = 'flagged';
+        source = 'llm';
+        comment = flaggedComments[Math.floor(Math.random() * flaggedComments.length)];
+        const wc = comment.split(/\s+/).length;
+        const warnType = Math.random() > 0.5
+          ? { label: 'Excessive caps', status: 'warn' }
+          : { label: `${wc} words`, status: 'warn' };
+        checks = [
+          ...passChecks,
+          warnType,
+          { label: brandMention ? 'Brand mentioned' : 'No brand (mystery)', status: 'pass' },
+        ];
+      } else {
+        status = 'fallback';
+        source = 'fallback';
+        comment = fallbackComments[Math.floor(Math.random() * fallbackComments.length)];
+        const wc = comment.split(/\s+/).length;
+        const failType = Math.random() > 0.5
+          ? { label: 'Duplicate (sim=0.72)', status: 'fail' }
+          : { label: 'No banned patterns', status: 'fail' };
+        checks = [
+          { label: 'No emoji', status: 'pass' },
+          { label: 'No hashtags', status: 'pass' },
+          failType,
+          { label: `${wc} words`, status: 'pass' },
+        ];
+      }
+
+      results.push({
+        post_id: p.id,
+        account_username: p.account_username,
+        tiktok_url: p.tiktok_url || '',
+        archetype: arch,
+        brand_mention: brandMention,
+        comment,
+        word_count: comment.split(/\s+/).length,
+        source,
+        status,
+        checks,
+      });
+    });
+
+    // Store state
+    this.ceAssignments = assignments;
+    this.ceRelevanceTags = relevanceTags;
+    this.ceResults = results;
+
+    // Build assignment map
+    const assignMap = {};
+    assignments.forEach(a => { assignMap[a.post_id] = a; });
+
+    // Render posts with archetypes + comments
+    this.ceRenderPostsPrePipeline(assignMap);
+
+    // Now render each result into its card
+    const resultMap = {};
+    results.forEach(r => { resultMap[r.post_id] = r; });
+
+    posts.forEach((p, i) => {
+      const result = resultMap[p.id];
+      if (!result) return;
+      const card = document.getElementById(`ce-post-${i}`);
+      if (!card) return;
+
+      card.classList.add('has-comment');
+      const commentBox = card.querySelector('.ce-comment-box');
+      if (!commentBox) return;
+
+      const statusColor = result.status === 'pass' ? 'var(--green)' : result.status === 'fallback' ? 'var(--red)' : 'var(--orange)';
+      const boxClass = result.status === 'pass' ? 'valid' : result.status === 'fallback' ? 'invalid' : 'valid';
+      commentBox.className = `ce-comment-box ${boxClass}`;
+
+      const checksHtml = (result.checks || []).map(c => `<span class="val-badge val-${c.status}">${c.label}</span>`).join('');
+      const sourceHtml = `<span class="val-badge ${result.source === 'llm' ? 'val-pass' : 'val-fail'}">${result.source}</span>`;
+
+      commentBox.innerHTML = `
+        <div class="ce-comment-label">
+          <span>Generated Comment (${result.word_count} words)</span>
+          <span style="font-size:10px; color:${statusColor}; text-transform:uppercase; font-weight:700;">${result.status}</span>
+        </div>
+        <div class="ce-comment-text" id="ce-comment-text-${i}">"${this.esc(result.comment)}"</div>
+        <div class="ce-comment-wc" id="ce-comment-wc-${i}">${result.word_count} words</div>
+        <div class="ce-comment-actions">
+          <button class="ce-edit-btn" onclick="App.ceEditComment(${i})">Edit</button>
+          ${sourceHtml}
+        </div>
+        ${checksHtml ? `<div class="validation-row">${checksHtml}</div>` : ''}
+      `;
+    });
+
+    // Summary
+    const totalPass = results.filter(r => r.status === 'pass').length;
+    const totalFlagged = results.filter(r => r.status === 'flagged').length;
+    const totalFallback = results.filter(r => r.status === 'fallback').length;
+
+    this.ceRenderSummary({
+      total_posts: posts.length,
+      total_comments: results.length,
+      llm_pass: totalPass,
+      flagged: totalFlagged,
+      fallback_used: totalFallback,
+      batches: 1,
+      model: 'test-mock',
+      errors: [],
+    });
+
+    this.ceSetStage('review');
+    const status = document.getElementById('cePipelineStatus');
+    status.textContent = `Test done! ${totalPass} passed, ${totalFlagged} flagged, ${totalFallback} fallbacks`;
+    status.style.color = 'var(--green)';
+    document.getElementById('ceExportBtn').classList.remove('hidden');
+
+    // Show sort/filter bar
+    document.getElementById('ceSortFilterBar').classList.remove('hidden');
+    this.ceSortMode = 'attention';
+    this.ceFilterMode = 'all';
+    this.ceReRenderAllResults();
   },
 
   _ceHighlightBatch(batchIdx, batchSize, on) {
@@ -988,7 +1331,7 @@ const App = {
     modal.classList.remove('hidden');
 
     try {
-      const res = await fetch('/api/ce/config/full');
+      const res = await this.authFetch('/api/ce/config/full');
       const data = await res.json();
       if (!data.loaded) {
         body.innerHTML = '<div style="text-align:center; padding:40px; color:var(--text-3);">No config loaded. Upload a config first.</div>';

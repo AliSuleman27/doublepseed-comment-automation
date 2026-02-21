@@ -10,7 +10,8 @@ Flow:
 """
 import os, sys, csv, io, json, traceback
 from datetime import datetime
-from flask import Flask, render_template, request, jsonify, Response, stream_with_context
+from functools import wraps
+from flask import Flask, render_template, request, jsonify, Response, g
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -22,8 +23,34 @@ from services.supabase_adapter import (
     get_all_posts_for_product, test_connection,
 )
 from services.comment_engine import run_pipeline, prepare_pipeline, process_batch
+from services.auth import (
+    sign_in as auth_sign_in, sign_up as auth_sign_up,
+    verify_token, refresh_session as auth_refresh, sign_out as auth_sign_out,
+)
 
 app = Flask(__name__)
+
+
+# ═══════════════════════════════════════════════
+# AUTH DECORATOR
+# ═══════════════════════════════════════════════
+
+def require_auth(f):
+    """Protect API routes. Checks Authorization: Bearer <token> header."""
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        auth_header = request.headers.get("Authorization", "")
+        if not auth_header.startswith("Bearer "):
+            return jsonify({"error": "Authentication required"}), 401
+        token = auth_header.split("Bearer ", 1)[1].strip()
+        if not token:
+            return jsonify({"error": "Authentication required"}), 401
+        user = verify_token(token)
+        if not user:
+            return jsonify({"error": "Invalid or expired token"}), 401
+        g.user = user
+        return f(*args, **kwargs)
+    return decorated
 
 _session = {"product_id": None, "template_id": None, "posts": []}
 _ce_config = {}  # Uploaded brand+template config
@@ -45,16 +72,87 @@ def _resolve_template(templates: dict, template_slug: str) -> dict | None:
 
 @app.route("/")
 def index():
-    products = get_products()
-    return render_template("index.html", products=products)
+    return render_template("index.html", products=[])
 
+
+# ═══════════════════════════════════════════════
+# AUTH API (unprotected)
+# ═══════════════════════════════════════════════
+
+@app.route("/api/auth/login", methods=["POST"])
+def api_auth_login():
+    data = request.json or {}
+    email = data.get("email", "").strip()
+    password = data.get("password", "")
+    if not email or not password:
+        return jsonify({"error": "Email and password are required"}), 400
+    try:
+        result = auth_sign_in(email, password)
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 401
+
+
+@app.route("/api/auth/signup", methods=["POST"])
+def api_auth_signup():
+    data = request.json or {}
+    email = data.get("email", "").strip()
+    password = data.get("password", "")
+    if not email or not password:
+        return jsonify({"error": "Email and password are required"}), 400
+    try:
+        result = auth_sign_up(email, password)
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+
+@app.route("/api/auth/refresh", methods=["POST"])
+def api_auth_refresh():
+    data = request.json or {}
+    refresh_token = data.get("refresh_token", "")
+    if not refresh_token:
+        return jsonify({"error": "refresh_token required"}), 400
+    try:
+        result = auth_refresh(refresh_token)
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 401
+
+
+@app.route("/api/auth/me", methods=["GET"])
+def api_auth_me():
+    auth_header = request.headers.get("Authorization", "")
+    if not auth_header.startswith("Bearer "):
+        return jsonify({"error": "No token provided"}), 401
+    token = auth_header.split("Bearer ", 1)[1].strip()
+    user = verify_token(token)
+    if not user:
+        return jsonify({"error": "Invalid or expired token"}), 401
+    return jsonify({"user": user})
+
+
+@app.route("/api/auth/logout", methods=["POST"])
+def api_auth_logout():
+    auth_header = request.headers.get("Authorization", "")
+    if auth_header.startswith("Bearer "):
+        token = auth_header.split("Bearer ", 1)[1].strip()
+        auth_sign_out(token)
+    return jsonify({"ok": True})
+
+
+# ═══════════════════════════════════════════════
+# PROTECTED API ROUTES
+# ═══════════════════════════════════════════════
 
 @app.route("/api/test")
+@require_auth
 def api_test():
     return jsonify(test_connection())
 
 
 @app.route("/api/products")
+@require_auth
 def api_products():
     try:
         return jsonify(get_products())
@@ -63,6 +161,7 @@ def api_products():
 
 
 @app.route("/api/products/<product_id>/templates")
+@require_auth
 def api_templates(product_id):
     try:
         return jsonify(get_templates_for_product(product_id))
@@ -71,6 +170,7 @@ def api_templates(product_id):
 
 
 @app.route("/api/products/<product_id>/accounts")
+@require_auth
 def api_accounts(product_id):
     try:
         return jsonify(get_accounts_for_product(product_id))
@@ -79,6 +179,7 @@ def api_accounts(product_id):
 
 
 @app.route("/api/posts/fetch", methods=["POST"])
+@require_auth
 def api_fetch_posts():
     data = request.json
     product_id = data.get("product_id")
@@ -124,6 +225,7 @@ def api_fetch_posts():
 
 
 @app.route("/api/posts/export", methods=["POST"])
+@require_auth
 def api_export():
     posts = _session.get("posts", [])
     if not posts:
@@ -154,6 +256,7 @@ def api_export():
 # ═══════════════════════════════════════════════
 
 @app.route("/api/ce/config", methods=["POST"])
+@require_auth
 def api_ce_upload_config():
     """Upload brand+template config JSON."""
     try:
@@ -189,6 +292,7 @@ def api_ce_upload_config():
 
 
 @app.route("/api/ce/config", methods=["GET"])
+@require_auth
 def api_ce_get_config():
     """Get the currently loaded config."""
     if not _ce_config:
@@ -201,6 +305,7 @@ def api_ce_get_config():
 
 
 @app.route("/api/ce/config/full", methods=["GET"])
+@require_auth
 def api_ce_config_full():
     """Get the full config for the viewer modal."""
     if not _ce_config:
@@ -209,6 +314,7 @@ def api_ce_config_full():
 
 
 @app.route("/api/ce/config/detail", methods=["GET"])
+@require_auth
 def api_ce_config_detail():
     """Get full config detail so UI can show archetype weights, relevance ratio, etc."""
     if not _ce_config:
@@ -235,6 +341,7 @@ def api_ce_config_detail():
 
 
 @app.route("/api/ce/generate", methods=["POST"])
+@require_auth
 def api_ce_generate():
     """Run the full comment generation pipeline.
 
@@ -283,6 +390,7 @@ def api_ce_generate():
 
 
 @app.route("/api/ce/prepare", methods=["POST"])
+@require_auth
 def api_ce_prepare():
     """Prepare the pipeline: assign archetypes, tag relevance, build prompts.
     Returns batch count, assignments, and relevance tags.
@@ -334,6 +442,7 @@ def api_ce_prepare():
 
 
 @app.route("/api/ce/batch/<int:batch_idx>", methods=["POST"])
+@require_auth
 def api_ce_process_batch(batch_idx):
     """Process a single batch and return its results."""
     if not _ce_prep:
