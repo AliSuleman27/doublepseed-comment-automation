@@ -1,22 +1,37 @@
 """Archetype Selector — Deterministic, no LLM.
 Assigns a comment archetype to each post using weighted random selection
-with max-2-per-batch diversity enforcement."""
+with max-2-per-batch diversity enforcement.
+Enhanced with: UI weight overrides, relevance tagging."""
 
 import random
 
 
-def assign_archetypes(posts: list[dict], config: dict, batch_size: int = 8) -> list[dict]:
+def assign_archetypes(posts: list[dict], config: dict, batch_size: int = 8,
+                      weight_overrides: dict | None = None) -> list[dict]:
     """Assign archetypes to posts in batches.
 
     Args:
         posts: List of post dicts (must have 'id')
         config: Template config with 'archetype_weights' and 'brand_mention_strategy'
         batch_size: Posts per batch (5-8)
+        weight_overrides: Optional dict of archetype -> weight from UI sliders
 
     Returns:
         List of dicts: [{"post_id": ..., "archetype": ..., "brand_mention": bool}, ...]
     """
-    weights = config.get("archetype_weights", {})
+    weights = dict(config.get("archetype_weights", {}))
+
+    # Apply UI weight overrides if provided
+    if weight_overrides:
+        for arch, w in weight_overrides.items():
+            if arch in weights:
+                weights[arch] = w
+
+    # Normalize weights to sum to 1.0
+    total = sum(w for w in weights.values() if w > 0)
+    if total > 0:
+        weights = {k: v / total for k, v in weights.items()}
+
     strategy = config.get("brand_mention_strategy", "always")
     assignments = []
 
@@ -36,6 +51,30 @@ def assign_archetypes(posts: list[dict], config: dict, batch_size: int = 8) -> l
             })
 
     return assignments
+
+
+def assign_relevance_tags(posts: list[dict], relevance_ratio: float = 0.5) -> dict:
+    """Tag each post as 'specific' or 'vibe' for relevance level.
+
+    Args:
+        posts: List of post dicts
+        relevance_ratio: 0.0-1.0, proportion that should be 'specific'
+                         (e.g. 0.5 means 50% specific, 50% vibe)
+
+    Returns:
+        Dict mapping post_id -> "specific" or "vibe"
+    """
+    tags = {}
+    post_ids = [p["id"] for p in posts]
+    n_specific = round(len(post_ids) * relevance_ratio)
+
+    # Randomly pick which posts get specific vs vibe
+    specific_ids = set(random.sample(post_ids, min(n_specific, len(post_ids))))
+
+    for pid in post_ids:
+        tags[pid] = "specific" if pid in specific_ids else "vibe"
+
+    return tags
 
 
 def _pick_archetype(weights: dict, type_counts: dict) -> str:

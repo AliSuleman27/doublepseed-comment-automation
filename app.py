@@ -30,6 +30,19 @@ _ce_config = {}  # Uploaded brand+template config
 _ce_prep = {}    # Prepared pipeline state for batch streaming
 
 
+def _resolve_template(templates: dict, template_slug: str) -> dict | None:
+    """Find matching template config by slug (exact, fuzzy, or first fallback)."""
+    tc = templates.get(template_slug)
+    if tc:
+        return tc
+    for slug, tc in templates.items():
+        if slug in template_slug or template_slug in slug:
+            return tc
+    if templates:
+        return next(iter(templates.values()))
+    return None
+
+
 @app.route("/")
 def index():
     products = get_products()
@@ -187,15 +200,50 @@ def api_ce_get_config():
     })
 
 
+@app.route("/api/ce/config/full", methods=["GET"])
+def api_ce_config_full():
+    """Get the full config for the viewer modal."""
+    if not _ce_config:
+        return jsonify({"loaded": False})
+    return jsonify({"loaded": True, "config": _ce_config})
+
+
+@app.route("/api/ce/config/detail", methods=["GET"])
+def api_ce_config_detail():
+    """Get full config detail so UI can show archetype weights, relevance ratio, etc."""
+    if not _ce_config:
+        return jsonify({"loaded": False})
+
+    slug = request.args.get("template_slug", "")
+    templates = _ce_config.get("templates", {})
+    tc = _resolve_template(templates, slug) if slug else None
+    if not tc and templates:
+        tc = next(iter(templates.values()))
+
+    brand = _ce_config.get("brand", {})
+
+    return jsonify({
+        "loaded": True,
+        "brand_name": brand.get("name", "unknown"),
+        "preferred_casing": brand.get("preferred_casing", {}),
+        "archetype_weights": tc.get("archetype_weights", {}) if tc else {},
+        "relevance_ratio": tc.get("relevance_ratio", 0.5) if tc else 0.5,
+        "comment_rules": tc.get("comment_rules", {}) if tc else {},
+        "golden_comments_count": len(tc.get("golden_comments", [])) if tc else 0,
+        "anti_examples_count": len(tc.get("anti_examples", [])) if tc else 0,
+    })
+
+
 @app.route("/api/ce/generate", methods=["POST"])
 def api_ce_generate():
     """Run the full comment generation pipeline.
 
     Body: {
-        "posts": [...],           // posts with tiktok links
-        "template_slug": "9-5",   // which template config to use
-        "model": "claude-haiku",  // LLM model
-        "batch_size": 8           // posts per batch
+        "posts": [...],
+        "template_slug": "9-5",
+        "model": "claude-haiku",
+        "batch_size": 8,
+        "overrides": { ... }     // optional UI overrides
     }
     """
     if not _ce_config:
@@ -206,6 +254,7 @@ def api_ce_generate():
     template_slug = data.get("template_slug", "")
     model = data.get("model", "claude-haiku")
     batch_size = data.get("batch_size", 8)
+    overrides = data.get("overrides", {})
 
     if not posts:
         return jsonify({"error": "No posts provided"}), 400
@@ -213,18 +262,7 @@ def api_ce_generate():
     brand_config = _ce_config.get("brand", {})
     templates = _ce_config.get("templates", {})
 
-    # Find matching template config
-    template_config = templates.get(template_slug)
-    if not template_config:
-        # Try fuzzy match
-        for slug, tc in templates.items():
-            if slug in template_slug or template_slug in slug:
-                template_config = tc
-                break
-    if not template_config:
-        # Use first template as fallback
-        template_config = next(iter(templates.values())) if templates else {}
-
+    template_config = _resolve_template(templates, template_slug)
     if not template_config:
         return jsonify({"error": f"No template config found for '{template_slug}'"}), 400
 
@@ -235,6 +273,7 @@ def api_ce_generate():
             template_config=template_config,
             model=model,
             batch_size=batch_size,
+            overrides=overrides,
         )
         return jsonify(result)
     except Exception as e:
@@ -245,8 +284,9 @@ def api_ce_generate():
 
 @app.route("/api/ce/prepare", methods=["POST"])
 def api_ce_prepare():
-    """Prepare the pipeline: assign archetypes, build prompts, create batches.
-    Returns batch count and assignments so frontend can call /api/ce/batch/<n>.
+    """Prepare the pipeline: assign archetypes, tag relevance, build prompts.
+    Returns batch count, assignments, and relevance tags.
+    Accepts overrides from UI controls.
     """
     if not _ce_config:
         return jsonify({"error": "No config uploaded. Upload a brand config first."}), 400
@@ -256,6 +296,7 @@ def api_ce_prepare():
     template_slug = data.get("template_slug", "")
     model = data.get("model", "claude-haiku")
     batch_size = data.get("batch_size", 8)
+    overrides = data.get("overrides", {})
 
     if not posts:
         return jsonify({"error": "No posts provided"}), 400
@@ -263,14 +304,7 @@ def api_ce_prepare():
     brand_config = _ce_config.get("brand", {})
     templates = _ce_config.get("templates", {})
 
-    template_config = templates.get(template_slug)
-    if not template_config:
-        for slug, tc in templates.items():
-            if slug in template_slug or template_slug in slug:
-                template_config = tc
-                break
-    if not template_config:
-        template_config = next(iter(templates.values())) if templates else {}
+    template_config = _resolve_template(templates, template_slug)
     if not template_config:
         return jsonify({"error": f"No template config found for '{template_slug}'"}), 400
 
@@ -281,6 +315,7 @@ def api_ce_prepare():
             template_config=template_config,
             model=model,
             batch_size=batch_size,
+            overrides=overrides,
         )
         _ce_prep.clear()
         _ce_prep.update(prep)
@@ -290,6 +325,7 @@ def api_ce_prepare():
             "total_batches": len(prep["batches"]),
             "total_posts": len(posts),
             "assignments": prep["assignments"],
+            "relevance_tags": prep.get("relevance_tags", {}),
         })
     except Exception as e:
         tb = traceback.format_exc()

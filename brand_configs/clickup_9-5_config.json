@@ -3,6 +3,10 @@
     "slug": "clickup",
     "name": "ClickUp",
     "name_variations": ["ClickUp", "clickup", "Clickup"],
+    "preferred_casing": {
+      "clickup": 0.50,
+      "Clickup": 0.50
+    },
     "global_banned_words": [
       "check out", "link in bio", "highly recommend", "game changer",
       "must have", "you should try", "sign up", "use code", "discount",
@@ -24,6 +28,8 @@
 
       "brand_mention_strategy": "always",
 
+      "relevance_ratio": 0.50,
+
       "archetype_weights": {
         "personal_testimony": 0.18,
         "situational_react": 0.15,
@@ -37,90 +43,76 @@
 
       "archetype_guidance": {
         "personal_testimony": {
-          "description": "You already use ClickUp and it solved YOUR version of the problem the post describes. Reference the specific role or pain point from the post.",
-          "patterns": [
-            "I used to [pain from the post]. ClickUp ended that",
-            "the [specific detail from a slide] part is too real. ClickUp fixed that for me",
-            "I keep mine in ClickUp and [personal outcome related to the post topic]"
-          ],
-          "notes": "Always tie back to something specific in the post — the role, a tip, the struggle. Never generic."
+          "description": "You already use ClickUp and it solved YOUR version of the problem. The comment is about your personal experience, not a product review. Keep it one sentence, keep it about what changed for you. Reference the post's topic loosely, not by quoting specific slides.",
+          "style_notes": "Confident, past-tense, matter-of-fact. 'I used to X, clickup ended that' energy. Never two sentences. Never compound clauses with 'and'. The brand mention should feel embedded, not bolted on at the end."
         },
         "situational_react": {
-          "description": "React emotionally to a specific detail from one of the slides. The reaction connects to ClickUp naturally.",
-          "patterns": [
-            "ClickUp giving [role]s their [benefit from post] back is the content I needed today",
-            "Async boards in ClickUp are the reason I actually [outcome related to post topic]",
-            "[specific data point or quote from slide] and ClickUp is behind all of it"
-          ],
-          "notes": "Reference a SPECIFIC slide detail — a tip, a subtext line, or the role. The commenter sounds like they swiped through every slide."
+          "description": "React to the VIBE of the post — the role, the struggle, the feeling. You don't need to quote a specific slide. You can react to the general theme. ClickUp connects naturally as part of your reaction, not as an afterthought.",
+          "style_notes": "Present-tense, reactive. Starts with the thing that hit you, ends with the brand naturally woven in. One fluid thought. Never 'the X part broke me and now I need Y' — that's a dead giveaway AI pattern."
         },
         "impulsive_action": {
-          "description": "This post just convinced you to download or try ClickUp RIGHT NOW. Urgency and spontaneity.",
-          "patterns": [
-            "downloading clickup rn because [specific reason from post]",
-            "Honestly clickup would save me so much time",
-            "I need ClickUp if it means [outcome mentioned in post or caption]",
-            "I have been [bad habit related to post topic] lol I need ClickUp"
-          ],
-          "notes": "The lowercase 'clickup' is intentional sometimes — real people don't always capitalize brand names."
+          "description": "This post just convinced you to download or try ClickUp. The urgency is casual, not dramatic. You're not downloading at 2am crying — you're just convinced by what you saw and acting on it.",
+          "style_notes": "Lowercase energy. 'downloading clickup rn because...' or 'I need clickup if it means...'. Short, punchy. NEVER include late-night time references like 'at 1am' or 'at 2am' — that's an emotional template pattern, not 9-5."
         },
         "social_sharing": {
-          "description": "You are sending this post to a specific person in your life. ClickUp is part of the package.",
-          "patterns": [
-            "not me screenshotting this to send to my [person] with a ClickUp link attached",
-            "sending this to every [person type related to post role] I know with a ClickUp link and zero explanation"
-          ],
-          "notes": "The person you are sending it to should make sense for the post's role or topic. A nurse post → 'my nurse friend'. A management post → 'my manager'."
+          "description": "You are sending this post to a specific person in your life. ClickUp is part of the package. The person you send it to should relate to the post's topic.",
+          "style_notes": "Starts with 'not me screenshotting...' or 'sending this to...' — but vary the structure. The person should make sense for the post role. One thought, no period in the middle."
         },
         "comparative_real": {
-          "description": "You were doing things the old, bad way. ClickUp is the upgrade you just realized you need.",
-          "patterns": [
-            "I have been [inferior method] like a caveman I think it is time to try ClickUp",
-            "me realizing ClickUp could fix my entire [negative self-description] era",
-            "I need ClickUp just to stop [self-deprecating thing related to post topic]"
-          ],
-          "notes": "The self-deprecation should be funny and relatable. 'planning in google sheets like a caveman', 'gaslighting myself into thinking I do nothing'."
+          "description": "You were doing things the old way. ClickUp is the upgrade you just realized you need. Self-deprecating humor about your inferior method.",
+          "style_notes": "The self-deprecation should be funny and specific. 'planning in google sheets like a caveman' energy. Never dramatic, never two sentences."
         },
         "hype_validation": {
-          "description": "Pure validation of ClickUp through an unexpected angle from the post. No personal story — just hype for the brand through a specific lens.",
-          "patterns": [
-            "ClickUp for [unexpected use case from post] is actually genius",
-            "this is why ClickUp is built different",
-            "ok but ClickUp being free while [impressive claim from post] is wild",
-            "Clickup saves [thing related to post topic], at this point put it in their app store description"
-          ],
-          "notes": "The unexpected use case is key. Not 'ClickUp for project management' (boring) but 'ClickUp for relationship maintenance' or 'ClickUp giving nurses their off days back' (surprising)."
+          "description": "A bold take about why ClickUp works for an unexpected use case from the post. No personal story — just hype through a surprising lens.",
+          "style_notes": "Confident, slightly cocky. 'Clickup for X is actually genius' or 'clickup understanding how real people work is wild'. One clean take, no compound sentences."
         },
         "curiosity_question": {
-          "description": "A genuine question about ClickUp features triggered by something in the post.",
-          "patterns": [
-            "does ClickUp actually have [feature implied by the post tip]",
-            "wait ClickUp can do [thing the post describes]?? how did I not know this",
-            "is ClickUp the same thing that [reference to the brand slide subtext]"
-          ],
-          "notes": "Rare for ClickUp 9-5 (only 10% weight). The question should sound genuinely curious, not planted."
+          "description": "A genuine question about ClickUp features triggered by the post. Sounds curious, not planted.",
+          "style_notes": "Rare. Starts with 'does clickup...' or 'wait clickup can...'. Genuinely curious tone, not rhetorical."
         }
       },
 
-      "example_comments": [
-        "I used to carry every client follow up in my head. ClickUp ended that",
-        "Imposter syndrome can't argue with a ClickUp dashboard full of completed projects",
-        "The 'person who had to remember everything alone' part is too real. ClickUp fixed that for me",
-        "ClickUp giving nurses their off days back is the content I needed today",
-        "ClickUp for relationship maintenance is actually genius",
+      "golden_comments": [
+        "I used to carry every client follow up in my head. Clickup ended that",
+        "Imposter syndrome can't argue with a clickup dashboard full of completed projects",
         "Honestly clickup would save me so much time",
-        "Async boards in ClickUp are the reason I actually like remote work now",
-        "I've been improvising every class and it shows lol I need ClickUp",
-        "me realizing ClickUp could fix my entire flaky era"
+        "Async boards in clickup are the reason I actually like remote work now",
+        "I've been improvising every class and it shows lol I need clickup",
+        "me realizing clickup could fix my entire flaky era",
+        "Clickup for relationship maintenance is actually genius",
+        "Clickup giving nurses their off days back is the content I needed today",
+        "sending this to all my nurse friends with a clickup link tbh",
+        "I need clickup if it means Sundays are actually mine fr",
+        "not me screenshotting this to send to my head chef bestie with a clickup link",
+        "I use clickup for work and honestly it gave me so much free time",
+        "downloading clickup rn bc calls after 6pm are killing me"
+      ],
+
+      "anti_examples": [
+        {"text": "the cortisol part actually broke me and now I need ClickUp", "reason": "too formulaic — slot-fill 'the X part broke me and now I need Y' is a dead AI pattern"},
+        {"text": "ClickUp gave me my mornings back and my creativity feels so good", "reason": "compound sentence with 'and' joining two independent clauses, vague second clause"},
+        {"text": "the reading case files in bed part actually broke me and now I need ClickUp", "reason": "same formulaic skeleton as above — never reuse sentence structures"},
+        {"text": "ClickUp gave me my evenings back and my students noticed", "reason": "too polished, two-clause compound sentence, feels like a testimonial ad"},
+        {"text": "when they said thursday schedule deadlines i literally felt that. ClickUp is the move", "reason": "two sentences glued with a period in the middle — comments should be one fluid thought"},
+        {"text": "me reading this while refreshing my email at 1am. I need ClickUp", "reason": "mid-sentence period creating two thoughts, and unnecessary late-night time reference"},
+        {"text": "downloading clickup at 2am bc the public opinion part hit hard", "reason": "unnecessary 2am time reference — this is a 9-5 template, not emotional"},
+        {"text": "omw to download clickup at 1am bc of the shutdown ritual", "reason": "late-night time reference does not fit 9-5 work-life balance tone"}
+      ],
+
+      "banned_patterns": [
+        "at 1am", "at 2am", "at 3am", "at 4am",
+        "actually broke me",
+        "and now I need"
       ],
 
       "comment_rules": {
-        "word_count_range": [8, 18],
+        "word_count_range": [6, 18],
         "always_mention_brand": true,
         "no_emojis": true,
         "no_hashtags": true,
         "no_trailing_punctuation": true,
         "allowed_slang": ["lol", "ngl", "tbh", "fr", "rn", "lowkey", "omw", "bc", "rly"],
+        "slang_frequency": "natural",
         "case_style": "mixed — some comments start lowercase, some uppercase. Never all caps except 1-2 words for emphasis like 'I NEED'.",
         "tone": "casual, genuine, text-a-friend energy. Never formal, never salesy, never corporate. The commenter sounds like a real person reacting in the moment."
       },
