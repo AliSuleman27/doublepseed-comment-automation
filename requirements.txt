@@ -47,7 +47,7 @@ multidict==6.7.1
 openai==2.21.0
 orjson==3.11.7
 ormsgpack==1.12.2
-packaging @ file:///opt/miniconda3/conda-bld/packaging_1761049079023/work
+packaging
 postgrest==2.28.0
 propcache==0.4.1
 pyasn1==0.6.2
