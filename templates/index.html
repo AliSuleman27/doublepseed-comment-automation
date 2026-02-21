@@ -9,7 +9,33 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-<div class="shell">
+
+<!-- Login Screen -->
+<div id="loginScreen" class="login-screen">
+  <div class="login-card">
+    <div class="login-brand">
+      <img src="https://app.doublespeed.ai/ds.ico" alt="DS" class="brand-logo">
+      <span>doublespeed</span>
+    </div>
+    <div class="login-title">Sign in to Post Viewer</div>
+    <div class="login-form">
+      <div>
+        <label class="label">Email</label>
+        <input type="email" id="loginEmail" class="input" placeholder="you@example.com"
+               onkeydown="if(event.key==='Enter') document.getElementById('loginPassword').focus()">
+      </div>
+      <div>
+        <label class="label">Password</label>
+        <input type="password" id="loginPassword" class="input" placeholder="Password"
+               onkeydown="if(event.key==='Enter') App.login()">
+      </div>
+      <div id="loginError" class="login-error hidden"></div>
+      <button class="btn btn-p login-btn" id="loginBtn" onclick="App.login()">Sign In</button>
+    </div>
+  </div>
+</div>
+
+<div class="shell hidden" id="appShell">
 
   <div class="topbar">
     <div class="brand">
@@ -21,6 +47,10 @@
       <button class="tab-btn" data-tab="comments" onclick="App.switchTab('comments')">Comment Engine</button>
     </div>
     <div class="topbar-right">
+      <div class="user-info hidden" id="userInfo">
+        <span class="user-email" id="userEmail"></span>
+        <button class="btn btn-s btn-sm" onclick="App.logout()">Logout</button>
+      </div>
       <div class="status-badge">
         <div class="status-dot" id="statusDot"></div>
         <span id="statusText">Loading...</span>
@@ -56,7 +86,7 @@
     </div>
 
     <div class="card mb-md" id="controls">
-      <div class="g4-controls">
+      <div class="g6-controls">
         <div>
           <label class="label">Client</label>
           <select id="productSelect" onchange="App.onProductChange(this.value)">
@@ -79,6 +109,20 @@
         <div>
           <label class="label">End Date</label>
           <input type="date" id="endDate" class="input">
+        </div>
+        <div>
+          <label class="label">Status</label>
+          <select id="statusFilter">
+            <option value="succeeded">Succeeded</option>
+            <option value="succeeded,scheduled">Succeeded + Scheduled</option>
+          </select>
+        </div>
+        <div>
+          <label class="label">Link Filter</label>
+          <select id="postFilter">
+            <option value="all">All Posts</option>
+            <option value="with_link">With TikTok Link</option>
+          </select>
         </div>
       </div>
       <div class="mt-md btn-row">
@@ -108,7 +152,7 @@
     <div class="pipeline-bar mb-md">
       <div class="pipe-stage active" data-stage="select">
         <div class="pipe-num">1</div>
-        <div class="pipe-label">Select Posts</div>
+        <div class="pipe-label">Select</div>
       </div>
       <div class="pipe-connector"></div>
       <div class="pipe-stage" data-stage="archetype">
@@ -126,15 +170,34 @@
         <div class="pipe-label">Validate</div>
       </div>
       <div class="pipe-connector"></div>
-      <div class="pipe-stage" data-stage="export">
+      <div class="pipe-stage" data-stage="review">
         <div class="pipe-num">5</div>
+        <div class="pipe-label">Review</div>
+      </div>
+      <div class="pipe-connector"></div>
+      <div class="pipe-stage" data-stage="export">
+        <div class="pipe-num">6</div>
         <div class="pipe-label">Export</div>
+      </div>
+    </div>
+
+    <!-- Config Upload -->
+    <div class="card mb-md" id="ceConfigCard">
+      <div class="card-head">
+        <div class="card-title">Brand Config</div>
+        <div class="card-sub" id="ceConfigStatus">No config loaded</div>
+      </div>
+      <div class="btn-row">
+        <input type="file" id="ceConfigFile" accept=".json" style="display:none" onchange="App.ceUploadConfig(this)">
+        <button class="btn btn-p" onclick="document.getElementById('ceConfigFile').click()">Upload Config JSON</button>
+        <button class="btn btn-s" id="ceViewConfigBtn" onclick="App.ceViewConfig()">View Config</button>
+        <span id="ceConfigInfo" style="font-size:12px; color:var(--text-3);"></span>
       </div>
     </div>
 
     <!-- Comment Engine Controls -->
     <div class="card mb-md">
-      <div class="g5-controls">
+      <div class="ce-controls-grid">
         <div>
           <label class="label">Client</label>
           <select id="ceProductSelect" onchange="App.ceOnProductChange(this.value)">
@@ -155,6 +218,13 @@
           <input type="date" id="ceDate" class="input">
         </div>
         <div>
+          <label class="label">Status</label>
+          <select id="ceStatusFilter">
+            <option value="succeeded">Succeeded</option>
+            <option value="succeeded,scheduled">Succeeded + Scheduled</option>
+          </select>
+        </div>
+        <div>
           <label class="label">Model</label>
           <select id="ceModel">
             <option value="claude-haiku">Claude Haiku</option>
@@ -169,10 +239,94 @@
             <option value="8" selected>8 posts</option>
           </select>
         </div>
+        <div>
+          <label class="label">Link Filter</label>
+          <select id="cePostFilter">
+            <option value="with_link" selected>With TikTok Link</option>
+            <option value="all">All Posts</option>
+          </select>
+        </div>
       </div>
       <div class="mt-md btn-row">
         <button class="btn btn-p" id="ceLoadBtn" onclick="App.ceLoadPosts()" disabled>Load Posts</button>
         <span id="ceLoadStatus" style="font-size:12px; color:var(--text-3); margin-left:8px;"></span>
+      </div>
+    </div>
+
+    <!-- Advanced Controls (collapsible) -->
+    <div class="card mb-md hidden" id="ceAdvancedCard">
+      <div class="card-head" style="cursor:pointer;" onclick="App.ceToggleAdvanced()">
+        <div class="card-title">Advanced Controls</div>
+        <div class="card-sub" id="ceAdvancedToggle">Show</div>
+      </div>
+      <div class="ce-advanced-body hidden" id="ceAdvancedBody">
+
+        <!-- Row 1: Relevance + Temperature + Slang + Word Count -->
+        <div class="ce-adv-row">
+          <div class="ce-adv-col">
+            <label class="label">Relevance Ratio <span id="ceRelevanceVal" class="ce-slider-val">50%</span></label>
+            <input type="range" id="ceRelevance" min="0" max="100" value="50" class="ce-slider"
+                   oninput="document.getElementById('ceRelevanceVal').textContent=this.value+'%'">
+            <div class="ce-slider-hint">% of comments that reference specific post content (rest are vibe-level)</div>
+          </div>
+          <div class="ce-adv-col">
+            <label class="label">Temperature <span id="ceTempVal" class="ce-slider-val">0.9</span></label>
+            <input type="range" id="ceTemperature" min="0" max="150" value="90" class="ce-slider"
+                   oninput="document.getElementById('ceTempVal').textContent=(this.value/100).toFixed(1)">
+            <div class="ce-slider-hint">Higher = more creative, Lower = more predictable</div>
+          </div>
+          <div class="ce-adv-col">
+            <label class="label">Slang Frequency</label>
+            <select id="ceSlang">
+              <option value="none">None</option>
+              <option value="light">Light</option>
+              <option value="natural" selected>Natural</option>
+              <option value="heavy">Heavy</option>
+            </select>
+          </div>
+          <div class="ce-adv-col ce-adv-col-narrow">
+            <label class="label">Min Words</label>
+            <input type="number" id="ceMinWords" value="6" min="3" max="15" class="input">
+          </div>
+          <div class="ce-adv-col ce-adv-col-narrow">
+            <label class="label">Max Words</label>
+            <input type="number" id="ceMaxWords" value="18" min="8" max="30" class="input">
+          </div>
+        </div>
+
+        <!-- Row 2: Brand Casing -->
+        <div class="ce-adv-row" style="margin-top:14px;">
+          <div class="ce-adv-col">
+            <label class="label">Brand Casing</label>
+            <select id="ceBrandCasing">
+              <option value="config">From Config (default)</option>
+              <option value="clickup_only">clickup only (all lowercase)</option>
+              <option value="Clickup_only">Clickup only (title case)</option>
+              <option value="mixed">50/50 clickup + Clickup</option>
+            </select>
+          </div>
+          <div class="ce-adv-col">
+            <label class="label">Max Same Structure</label>
+            <select id="ceMaxStructure">
+              <option value="1" selected>1 per skeleton (strictest)</option>
+              <option value="2">2 per skeleton</option>
+              <option value="3">3 per skeleton</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Row 3: Archetype Weight Sliders -->
+        <div style="margin-top:14px;">
+          <label class="label" style="margin-bottom:10px;">Archetype Weights (drag to adjust)</label>
+          <div class="ce-arch-sliders" id="ceArchSliders">
+            <!-- Populated dynamically by JS when config loads -->
+            <div style="font-size:12px; color:var(--text-3);">Upload a config to see archetype weights</div>
+          </div>
+          <div class="btn-row" style="margin-top:8px;">
+            <button class="btn btn-s" onclick="App.ceResetWeights()">Reset to Config Defaults</button>
+          </div>
+        </div>
+
       </div>
     </div>
 
@@ -182,14 +336,46 @@
     <!-- Batch Actions -->
     <div class="card mb-md hidden" id="ceBatchActions">
       <div class="card-head">
-        <div class="card-title">Batch Actions</div>
+        <div class="card-title">Pipeline</div>
         <div class="card-sub" id="ceBatchSub"></div>
       </div>
       <div class="btn-row">
-        <button class="btn btn-p" id="ceAssignBtn" onclick="App.ceAssignArchetypes()">Assign Archetypes</button>
-        <button class="btn btn-p" id="ceGenerateBtn" onclick="App.ceGenerate()" disabled>Generate Comments</button>
-        <button class="btn btn-s" id="ceValidateBtn" onclick="App.ceValidate()" disabled>Validate All</button>
-        <button class="btn btn-g" id="ceExportBtn" onclick="App.ceExport()" disabled>Export Comments</button>
+        <button class="btn btn-p" id="ceRunPipelineBtn" onclick="App.ceRunPipeline()">Run Full Pipeline</button>
+        <button class="btn btn-s" onclick="App.ceRunTestPipeline()">Test Pipeline</button>
+        <button class="btn btn-g hidden" id="ceExportBtn" onclick="App.ceExport()">Export Comments</button>
+        <span id="cePipelineStatus" style="font-size:12px; color:var(--text-3); margin-left:8px;"></span>
+      </div>
+    </div>
+
+    <!-- Pipeline Summary -->
+    <div class="card mb-md hidden" id="ceSummaryCard">
+      <div class="card-head">
+        <div class="card-title">Pipeline Summary</div>
+      </div>
+      <div id="ceSummaryContent"></div>
+    </div>
+
+    <!-- Sort / Filter Bar -->
+    <div class="card mb-md hidden" id="ceSortFilterBar">
+      <div class="ce-sort-filter">
+        <div class="ce-sf-group">
+          <label class="label">Sort</label>
+          <div class="ce-sf-btns">
+            <button class="ce-sf-btn active" data-sort="attention" onclick="App.ceSortBy('attention')">Needs Attention</button>
+            <button class="ce-sf-btn" data-sort="default" onclick="App.ceSortBy('default')">Default Order</button>
+            <button class="ce-sf-btn" data-sort="account" onclick="App.ceSortBy('account')">By Account</button>
+          </div>
+        </div>
+        <div class="ce-sf-group">
+          <label class="label">Filter</label>
+          <div class="ce-sf-btns">
+            <button class="ce-sf-btn active" data-filter="all" onclick="App.ceFilterBy('all')">All</button>
+            <button class="ce-sf-btn" data-filter="fallback" onclick="App.ceFilterBy('fallback')">Fallback</button>
+            <button class="ce-sf-btn" data-filter="flagged" onclick="App.ceFilterBy('flagged')">Flagged</button>
+            <button class="ce-sf-btn" data-filter="pass" onclick="App.ceFilterBy('pass')">Passed</button>
+          </div>
+        </div>
+        <div class="ce-sf-count" id="ceSfCount"></div>
       </div>
     </div>
 
@@ -198,6 +384,17 @@
 
   </div>
 
+</div>
+
+<!-- Config Viewer Modal -->
+<div class="cfg-modal-overlay hidden" id="ceConfigModal" onclick="if(event.target===this) App.ceCloseConfigModal()">
+  <div class="cfg-modal">
+    <div class="cfg-modal-head">
+      <div class="cfg-modal-title">Brand Config</div>
+      <button class="cfg-modal-close" onclick="App.ceCloseConfigModal()">&times;</button>
+    </div>
+    <div class="cfg-modal-body" id="ceConfigModalBody"></div>
+  </div>
 </div>
 
 <script src="{{ url_for('static', filename='js/app.js') }}"></script>

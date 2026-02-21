@@ -1,0 +1,21 @@
+[    1110ms] [ERROR] Failed to load resource: net::ERR_FAILED @ chrome-extension://invalid/:0
+[    3698ms] [WARNING] An iframe which has both allow-scripts and allow-same-origin for its sandbox attribute can escape its sandboxing. @ https://drive.google.com/auth_warmup:0
+[    6436ms] [ERROR] Failed to load resource: net::ERR_FAILED @ chrome-extension://invalid/:0
+[    6455ms] [ERROR] Failed to load resource: net::ERR_FAILED @ chrome-extension://invalid/:0
+[    6459ms] [ERROR] Failed to load resource: net::ERR_FAILED @ chrome-extension://invalid/:0
+[    6464ms] [ERROR] Failed to load resource: net::ERR_FAILED @ chrome-extension://invalid/:0
+[   49815ms] [ERROR] Failed to load resource: net::ERR_NAME_NOT_RESOLVED @ https://v1/genai/getSettings?key=:0
+[   49922ms] [ERROR] Failed to load resource: net::ERR_NAME_NOT_RESOLVED @ https://v1/genai/getSettings?key=:0
+[   50029ms] [ERROR] Failed to load resource: net::ERR_NAME_NOT_RESOLVED @ https://v1/genai/getSettings?key=:0
+[   67672ms] Error: DOCS_initialLoadTiming is not defined.
+    at https://docs.google.com/presentation/u/0/preload?source=drive:20:1097
+[   67673ms] Error: DOCS_initialLoadTiming is not defined.
+    at https://docs.google.com/drawings/u/0/preload?source=drive:20:739
+[   67673ms] Error: DOCS_initialLoadTiming is not defined.
+    at https://docs.google.com/document/u/0/preload?source=drive:20:908
+[   67676ms] Error: DOCS_initialLoadTiming is not defined.
+    at https://docs.google.com/videos/u/0/preload?source=drive:20:717
+[   67709ms] Error: DOCS_initialLoadTiming is not defined.
+    at https://docs.google.com/spreadsheets/u/0/preload?source=drive:11:16549
+[   67798ms] Error: DOCS_initialLoadTiming is not defined.
+    at https://drive.google.com/file/u/0/preload?source=drive:11:636

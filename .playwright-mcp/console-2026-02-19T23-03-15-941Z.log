@@ -1,0 +1,23 @@
+[     393ms] [ERROR] Failed to load resource: net::ERR_FAILED @ chrome-extension://invalid/:0
+[    1718ms] [WARNING] An iframe which has both allow-scripts and allow-same-origin for its sandbox attribute can escape its sandboxing. @ https://drive.google.com/auth_warmup:0
+[    4542ms] [ERROR] Failed to load resource: net::ERR_FAILED @ chrome-extension://invalid/:0
+[    4550ms] [ERROR] Failed to load resource: net::ERR_FAILED @ chrome-extension://invalid/:0
+[    4556ms] [ERROR] Failed to load resource: net::ERR_FAILED @ chrome-extension://invalid/:0
+[    4556ms] [ERROR] Failed to load resource: net::ERR_FAILED @ chrome-extension://invalid/:0
+[   18191ms] [ERROR] Failed to load resource: net::ERR_NAME_NOT_RESOLVED @ https://v1/genai/getSettings?key=:0
+[   18297ms] [ERROR] Failed to load resource: net::ERR_NAME_NOT_RESOLVED @ https://v1/genai/getSettings?key=:0
+[   18404ms] [ERROR] Failed to load resource: net::ERR_NAME_NOT_RESOLVED @ https://v1/genai/getSettings?key=:0
+[   65640ms] Error: DOCS_initialLoadTiming is not defined.
+    at https://docs.google.com/spreadsheets/u/0/preload?source=drive:11:16549
+[   65646ms] Error: DOCS_initialLoadTiming is not defined.
+    at https://docs.google.com/presentation/u/0/preload?source=drive:20:1097
+[   65651ms] Error: DOCS_initialLoadTiming is not defined.
+    at https://drive.google.com/file/u/0/preload?source=drive:11:636
+[   65652ms] Error: DOCS_initialLoadTiming is not defined.
+    at https://docs.google.com/drawings/u/0/preload?source=drive:20:739
+[   65657ms] Error: DOCS_initialLoadTiming is not defined.
+    at https://docs.google.com/videos/u/0/preload?source=drive:20:717
+[   65661ms] Error: DOCS_initialLoadTiming is not defined.
+    at https://docs.google.com/document/u/0/preload?source=drive:20:908
+[ 2574937ms] [ERROR] Failed to load resource: the server responded with a status of 500 () @ https://drivefrontend-pa.clients6.google.com/v1/changes:list?key=AIzaSyD_InbmSFufIEps5UAt2NmB_3LvBH3Sz_8:0
+[ 4238757ms] [ERROR] Failed to load resource: net::ERR_QUIC_PROTOCOL_ERROR @ https://signaler-pa.clients6.google.com/punctual/multi-watch/channel?VER=8&gsessionid=84bHsQlvl8dBomi5IokBPa8yLBTCMlcR-p6ZieGTlC0&key=AIzaSyAWGrfCCr7albM3lmCc937gx4uIphbpeKQ&RID=rpc&SID=Cur8C93tUAttBzDzCL1X5g&AID=43&CI=0&TYPE=xmlhttp&zx=cxbmcb9tjz03&t=1:0

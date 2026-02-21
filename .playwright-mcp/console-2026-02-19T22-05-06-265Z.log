@@ -1,0 +1,10 @@
+[    2018ms] [ERROR] Failed to load resource: net::ERR_FAILED @ chrome-extension://invalid/:0
+[    3827ms] [WARNING] An iframe which has both allow-scripts and allow-same-origin for its sandbox attribute can escape its sandboxing. @ https://drive.google.com/auth_warmup:0
+[    8206ms] [ERROR] Failed to load resource: net::ERR_FAILED @ chrome-extension://invalid/:0
+[    8281ms] [ERROR] Failed to load resource: net::ERR_FAILED @ chrome-extension://invalid/:0
+[    8314ms] [ERROR] Failed to load resource: net::ERR_FAILED @ chrome-extension://invalid/:0
+[    8315ms] [ERROR] Failed to load resource: net::ERR_FAILED @ chrome-extension://invalid/:0
+[   12186ms] [ERROR] Failed to load resource: net::ERR_NAME_NOT_RESOLVED @ https://v1/genai/getSettings?key=:0
+[   12294ms] [ERROR] Failed to load resource: net::ERR_NAME_NOT_RESOLVED @ https://v1/genai/getSettings?key=:0
+[   12416ms] [ERROR] Failed to load resource: net::ERR_NAME_NOT_RESOLVED @ https://v1/genai/getSettings?key=:0
+[   57928ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_CLOSED @ https://ssl.gstatic.com/docs/common/cleardot.gif?zx=gagk5ynpryuk:0

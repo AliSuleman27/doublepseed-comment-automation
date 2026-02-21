@@ -1,0 +1,23 @@
+[    1214ms] [ERROR] Failed to load resource: net::ERR_FAILED @ chrome-extension://invalid/:0
+[    3480ms] [WARNING] An iframe which has both allow-scripts and allow-same-origin for its sandbox attribute can escape its sandboxing. @ https://drive.google.com/auth_warmup:0
+[    6046ms] [ERROR] Failed to load resource: net::ERR_FAILED @ chrome-extension://invalid/:0
+[    6056ms] [ERROR] Failed to load resource: net::ERR_FAILED @ chrome-extension://invalid/:0
+[    6059ms] [ERROR] Failed to load resource: net::ERR_FAILED @ chrome-extension://invalid/:0
+[    6062ms] [ERROR] Failed to load resource: net::ERR_FAILED @ chrome-extension://invalid/:0
+[   27632ms] [ERROR] Failed to load resource: net::ERR_NAME_NOT_RESOLVED @ https://v1/genai/getSettings?key=:0
+[   27740ms] [ERROR] Failed to load resource: net::ERR_NAME_NOT_RESOLVED @ https://v1/genai/getSettings?key=:0
+[   27848ms] [ERROR] Failed to load resource: net::ERR_NAME_NOT_RESOLVED @ https://v1/genai/getSettings?key=:0
+[   67397ms] Error: DOCS_initialLoadTiming is not defined.
+    at https://docs.google.com/drawings/u/0/preload?source=drive:20:739
+[   67403ms] Error: DOCS_initialLoadTiming is not defined.
+    at https://docs.google.com/document/u/0/preload?source=drive:20:908
+[   67406ms] Error: DOCS_initialLoadTiming is not defined.
+    at https://docs.google.com/videos/u/0/preload?source=drive:20:717
+[   67413ms] Error: DOCS_initialLoadTiming is not defined.
+    at https://docs.google.com/presentation/u/0/preload?source=drive:20:1097
+[   67420ms] Error: DOCS_initialLoadTiming is not defined.
+    at https://drive.google.com/file/u/0/preload?source=drive:11:636
+[   67430ms] Error: DOCS_initialLoadTiming is not defined.
+    at https://docs.google.com/spreadsheets/u/0/preload?source=drive:11:16549
+[   91967ms] [WARNING] An iframe which has both allow-scripts and allow-same-origin for its sandbox attribute can escape its sandboxing. @ https://drive.google.com/drivesharing/clientmodel?id=122NEloHymxOefbDNGYfH-dLuxdWzc_GL&foreignService=explorer&authuser=0&origin=https%3A%2F%2Fdrive.google.com:0
+[  119462ms] [WARNING] An iframe which has both allow-scripts and allow-same-origin for its sandbox attribute can escape its sandboxing. @ https://drive.google.com/drivesharing/clientmodel?id=124IssabIs-YfJ9NbCeMU9PLGTth2Eo3s&foreignService=explorer&authuser=0&origin=https%3A%2F%2Fdrive.google.com:0

@@ -1,0 +1,23 @@
+[     794ms] [ERROR] Failed to load resource: net::ERR_FAILED @ chrome-extension://invalid/:0
+[    1421ms] [ERROR] Failed to load resource: net::ERR_NAME_NOT_RESOLVED @ https://v1/genai/getSettings?key=:0
+[    1529ms] [ERROR] Failed to load resource: net::ERR_NAME_NOT_RESOLVED @ https://v1/genai/getSettings?key=:0
+[    1649ms] [ERROR] Failed to load resource: net::ERR_NAME_NOT_RESOLVED @ https://v1/genai/getSettings?key=:0
+[    1781ms] [WARNING] An iframe which has both allow-scripts and allow-same-origin for its sandbox attribute can escape its sandboxing. @ https://drive.google.com/auth_warmup:0
+[    5301ms] [ERROR] Failed to load resource: net::ERR_FAILED @ chrome-extension://invalid/:0
+[    5332ms] [ERROR] Failed to load resource: net::ERR_FAILED @ chrome-extension://invalid/:0
+[    5367ms] [ERROR] Failed to load resource: net::ERR_FAILED @ chrome-extension://invalid/:0
+[    5380ms] [ERROR] Failed to load resource: net::ERR_FAILED @ chrome-extension://invalid/:0
+[   19875ms] [ERROR] Failed to load resource: the server responded with a status of 403 () @ https://clients6.google.com/drive/v2internal/files?q=shortcutDetails.targetId%3D%271x3Dn4M-A9tkBQHHHNEPopfrEfVIFbeCn%27%20and%20creator%3D%27me%27%20and%20trashed%3Dfalse&fields=kind%2C%20items(kind%2Cid%2Ctitle%2CshortcutDetails(targetId%2CtargetResourceKey)%2CuserPermission(role)%2Cshared%2CalternateLink%2CiconLink%2CprimarySyncParentId%2CmimeType%2Cparents(id)%2CteamDriveId%2Ccapabilities(canAddChildren%2CcanAddMyDriveParent%2CcanEdit%2CcanRemoveChildren%2CcanMoveChildrenWithinDrive%2CcanMoveTeamDriveItem%2CcanMoveItemIntoTeamDrive%2CcanMoveItemOutOfDrive%2CcanMoveItemOutOfTeamDrive%2CcanMoveItemWithinDrive%2CcanMoveChildrenOutOfTeamDrive))&supportsTeamDrives=true&includeTeamDriveItems=true&key=AIzaSyD_InbmSFufIEps5UAt2NmB_3LvBH3Sz_8&%24unique=gc078:0
+[   19893ms] [WARNING] An iframe which has both allow-scripts and allow-same-origin for its sandbox attribute can escape its sandboxing. @ https://drive.google.com/drivesharing/clientmodel?id=1x3Dn4M-A9tkBQHHHNEPopfrEfVIFbeCn&foreignService=explorer&authuser=0&origin=https%3A%2F%2Fdrive.google.com:0
+[   66135ms] Error: DOCS_initialLoadTiming is not defined.
+    at https://drive.google.com/file/u/0/preload?source=drive:11:636
+[   66179ms] Error: DOCS_initialLoadTiming is not defined.
+    at https://docs.google.com/document/u/0/preload?source=drive:20:908
+[   66206ms] Error: DOCS_initialLoadTiming is not defined.
+    at https://docs.google.com/spreadsheets/u/0/preload?source=drive:11:16549
+[   66557ms] Error: DOCS_initialLoadTiming is not defined.
+    at https://docs.google.com/presentation/u/0/preload?source=drive:20:1097
+[   66734ms] Error: DOCS_initialLoadTiming is not defined.
+    at https://docs.google.com/videos/u/0/preload?source=drive:20:717
+[   67079ms] Error: DOCS_initialLoadTiming is not defined.
+    at https://docs.google.com/drawings/u/0/preload?source=drive:20:739

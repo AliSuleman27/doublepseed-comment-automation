@@ -29,6 +29,37 @@ html,body { height:100%; font-family:var(--sans); background:var(--bg-1); color:
 ::selection { background:var(--accent); color:#fff; }
 ::-webkit-scrollbar { width:5px; } ::-webkit-scrollbar-track { background:transparent; } ::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
 
+/* ─── Login Screen ─────────────────── */
+.login-screen {
+  position:fixed; top:0; left:0; right:0; bottom:0;
+  background:var(--bg-1); z-index:2000;
+  display:flex; align-items:center; justify-content:center;
+}
+.login-screen.hidden { display:none !important; }
+.login-card {
+  background:var(--bg-2); border:1px solid var(--border); border-radius:14px;
+  padding:40px; width:380px; max-width:90vw;
+  box-shadow:0 20px 60px rgba(0,0,0,.5);
+}
+.login-brand {
+  display:flex; align-items:center; gap:10px; justify-content:center;
+  font-weight:600; font-size:18px; letter-spacing:-.02em; margin-bottom:24px;
+}
+.login-title {
+  text-align:center; font-size:14px; color:var(--text-3); margin-bottom:24px;
+}
+.login-form { display:flex; flex-direction:column; gap:14px; }
+.login-btn { width:100%; padding:10px; font-size:14px; }
+.login-error {
+  font-size:12px; color:var(--red); background:var(--red-dim);
+  padding:8px 12px; border-radius:6px; text-align:center;
+}
+
+/* ─── User Info in Topbar ─────────────────── */
+.user-info { display:flex; align-items:center; gap:10px; }
+.user-email { font-size:12px; color:var(--text-3); font-family:var(--mono); }
+.btn-sm { padding:4px 12px; font-size:11px; }
+
 /* ─── Layout ─────────────────── */
 .shell { display:grid; grid-template-columns:220px 1fr; grid-template-rows:50px 1fr; height:100vh; }
 
@@ -70,7 +101,9 @@ html,body { height:100%; font-family:var(--sans); background:var(--bg-1); color:
 .mt-md { margin-top:14px; }
 
 .g4-controls { display:grid; grid-template-columns:1fr 1fr 150px 150px; gap:12px; }
-.g5-controls { display:grid; grid-template-columns:1fr 1fr 140px 160px 100px; gap:12px; }
+.g5-controls { display:grid; grid-template-columns:1fr 1fr 140px 140px 140px; gap:12px; }
+.g6-controls { display:grid; grid-template-columns:1fr 1fr 140px 140px 160px 140px; gap:12px; }
+.ce-controls-grid { display:grid; grid-template-columns:1fr 1fr 140px 160px 160px 100px 140px; gap:12px; }
 .g4 { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
 .g5 { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; }
 
@@ -222,9 +255,6 @@ input[type="date"] { color-scheme: dark; }
   color:var(--text-3); margin-bottom:6px;
   display:flex; align-items:center; justify-content:space-between;
 }
-.ce-comment-text {
-  font-size:14px; color:var(--text-1); line-height:1.5; font-style:italic;
-}
 .ce-comment-placeholder {
   font-size:13px; color:var(--text-3); font-style:italic;
 }
@@ -251,6 +281,198 @@ input[type="date"] { color-scheme: dark; }
   font-size:11px; font-weight:700; font-family:var(--mono);
   color:var(--accent); background:var(--accent-dim);
   padding:4px 12px; border-radius:6px; white-space:nowrap;
+}
+
+/* ─── Editable Comment ─────────────────── */
+.ce-comment-text {
+  font-size:14px; color:var(--text-1); line-height:1.5; font-style:italic;
+}
+.ce-comment-actions {
+  display:flex; gap:6px; margin-top:8px;
+}
+.ce-edit-btn {
+  padding:3px 10px; border-radius:5px; border:1px solid var(--border);
+  background:var(--bg-4); color:var(--text-3); font-size:11px; font-weight:600;
+  font-family:var(--mono); cursor:pointer; transition:.15s;
+}
+.ce-edit-btn:hover { border-color:var(--accent); color:var(--accent); }
+.ce-edit-btn.save { border-color:var(--green); color:var(--green); }
+.ce-edit-btn.save:hover { background:var(--green-dim); }
+.ce-edit-btn.cancel { border-color:var(--red); color:var(--red); }
+.ce-edit-btn.cancel:hover { background:var(--red-dim); }
+
+.ce-comment-edit {
+  width:100%; padding:8px 10px; border-radius:6px; border:1px solid var(--accent);
+  background:var(--bg-1); color:var(--text-1); font-size:14px; font-family:var(--sans);
+  font-style:italic; line-height:1.5; resize:vertical; outline:none;
+  min-height:40px;
+}
+.ce-comment-edit:focus { box-shadow:0 0 0 2px var(--accent-dim); }
+
+.ce-comment-wc {
+  font-size:10px; color:var(--text-3); font-family:var(--mono); margin-top:4px;
+}
+
+/* ─── Status badge in post cards ─────────────────── */
+.post-status-scheduled {
+  color:var(--orange); background:var(--orange-dim);
+}
+
+/* ─── Batch progress indicator ─────────────────── */
+.batch-processing {
+  border-color:var(--orange) !important;
+  box-shadow: 0 0 0 1px var(--orange-dim);
+}
+
+/* ─── Advanced Controls Panel ─────────────────── */
+.ce-advanced-body { padding-top:16px; }
+
+.ce-adv-row {
+  display:grid; grid-template-columns:1fr 1fr 140px 90px 90px; gap:12px; align-items:start;
+}
+.ce-adv-col { min-width:0; }
+.ce-adv-col-narrow { max-width:90px; }
+
+.ce-slider {
+  -webkit-appearance:none; appearance:none;
+  width:100%; height:4px; border-radius:2px;
+  background:var(--bg-3); outline:none; margin-top:4px;
+}
+.ce-slider::-webkit-slider-thumb {
+  -webkit-appearance:none; appearance:none;
+  width:16px; height:16px; border-radius:50%;
+  background:var(--accent); cursor:pointer;
+  border:2px solid var(--bg-2);
+}
+.ce-slider::-moz-range-thumb {
+  width:16px; height:16px; border-radius:50%;
+  background:var(--accent); cursor:pointer;
+  border:2px solid var(--bg-2);
+}
+.ce-slider-val {
+  color:var(--accent); font-family:var(--mono); font-size:11px; font-weight:600;
+}
+.ce-slider-hint {
+  font-size:10px; color:var(--text-3); margin-top:4px;
+}
+
+/* ─── Archetype Weight Sliders ─────────────────── */
+.ce-arch-sliders { display:grid; grid-template-columns:1fr 1fr; gap:8px 16px; }
+.ce-arch-slider-row {
+  display:flex; align-items:center; gap:8px; padding:4px 0;
+}
+.ce-arch-slider-label {
+  font-size:11px; font-weight:600; font-family:var(--mono);
+  min-width:130px; display:flex; align-items:center; gap:6px;
+}
+.ce-arch-slider-label .arch-dot {
+  width:8px; height:8px; border-radius:50%; flex-shrink:0;
+}
+.ce-arch-slider-input {
+  flex:1; -webkit-appearance:none; appearance:none;
+  height:3px; border-radius:2px; background:var(--bg-3); outline:none;
+}
+.ce-arch-slider-input::-webkit-slider-thumb {
+  -webkit-appearance:none; appearance:none;
+  width:12px; height:12px; border-radius:50%;
+  background:var(--accent); cursor:pointer;
+}
+.ce-arch-slider-pct {
+  font-size:10px; font-family:var(--mono); color:var(--text-3); min-width:32px; text-align:right;
+}
+
+/* ─── Relevance Tag Badge ─────────────────── */
+.relevance-badge {
+  display:inline-flex; align-items:center; padding:2px 6px; border-radius:4px;
+  font-size:9px; font-weight:700; font-family:var(--mono); letter-spacing:.5px;
+  text-transform:uppercase;
+}
+.relevance-badge.specific { color:var(--cyan); background:rgba(48,128,255,.12); }
+.relevance-badge.vibe { color:var(--purple); background:var(--purple-dim); }
+
+/* ─── Sort / Filter Bar ─────────────────── */
+.ce-sort-filter {
+  display:flex; align-items:flex-end; gap:20px; flex-wrap:wrap;
+}
+.ce-sf-group { display:flex; flex-direction:column; gap:6px; }
+.ce-sf-btns { display:flex; gap:4px; }
+.ce-sf-btn {
+  padding:5px 12px; border-radius:6px; border:1px solid var(--border);
+  background:var(--bg-3); color:var(--text-3); font-size:11px; font-weight:600;
+  font-family:var(--mono); cursor:pointer; transition:.15s; white-space:nowrap;
+}
+.ce-sf-btn:hover { border-color:var(--text-3); color:var(--text-2); }
+.ce-sf-btn.active { border-color:var(--accent); color:var(--accent); background:var(--accent-dim); }
+.ce-sf-count {
+  font-size:11px; color:var(--text-3); font-family:var(--mono);
+  padding-bottom:6px; margin-left:auto;
+}
+
+/* ─── Config Viewer Modal ─────────────────── */
+.cfg-modal-overlay {
+  position:fixed; top:0; left:0; right:0; bottom:0;
+  background:rgba(0,0,0,.7); z-index:1000;
+  display:flex; align-items:center; justify-content:center;
+  backdrop-filter:blur(4px);
+}
+.cfg-modal-overlay.hidden { display:none !important; }
+.cfg-modal {
+  background:var(--bg-2); border:1px solid var(--border); border-radius:14px;
+  width:720px; max-width:90vw; max-height:85vh; display:flex; flex-direction:column;
+  box-shadow:0 20px 60px rgba(0,0,0,.5);
+}
+.cfg-modal-head {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:18px 24px; border-bottom:1px solid var(--border);
+}
+.cfg-modal-title { font-size:16px; font-weight:700; }
+.cfg-modal-close {
+  width:32px; height:32px; border-radius:8px; border:1px solid var(--border);
+  background:var(--bg-3); color:var(--text-2); font-size:20px; line-height:1;
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
+  transition:.15s;
+}
+.cfg-modal-close:hover { border-color:var(--red); color:var(--red); background:var(--red-dim); }
+.cfg-modal-body { padding:20px 24px; overflow-y:auto; flex:1; }
+
+.cfg-section { margin-bottom:20px; }
+.cfg-section:last-child { margin-bottom:0; }
+.cfg-section-title {
+  font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:.8px;
+  color:var(--accent); margin-bottom:10px; padding-bottom:6px;
+  border-bottom:1px solid var(--border);
+}
+.cfg-row {
+  display:flex; gap:12px; padding:6px 0; border-bottom:1px solid rgba(42,42,44,.4);
+  align-items:flex-start;
+}
+.cfg-row:last-child { border-bottom:none; }
+.cfg-key {
+  font-size:11px; font-weight:600; font-family:var(--mono); color:var(--text-3);
+  min-width:140px; flex-shrink:0; padding-top:2px; text-transform:uppercase; letter-spacing:.5px;
+}
+.cfg-val { font-size:13px; color:var(--text-2); line-height:1.5; flex:1; min-width:0; }
+.cfg-val-long { word-break:break-word; }
+.cfg-list { display:flex; flex-direction:column; gap:6px; }
+.cfg-golden {
+  font-size:12px; color:var(--green); background:var(--green-dim);
+  padding:6px 10px; border-radius:6px; font-style:italic; line-height:1.4;
+}
+.cfg-anti {
+  display:flex; flex-direction:column; gap:2px;
+  padding:6px 10px; border-radius:6px; background:var(--red-dim);
+}
+.cfg-anti-text { font-size:12px; color:var(--red); font-style:italic; }
+.cfg-anti-reason { font-size:10px; color:var(--text-3); }
+.cfg-arch-tags { display:flex; flex-wrap:wrap; gap:4px; }
+.cfg-arch-tag {
+  display:inline-flex; padding:3px 8px; border-radius:4px;
+  font-size:10px; font-weight:600; font-family:var(--mono);
+}
+.cfg-banned-tag {
+  display:inline-flex; padding:3px 8px; border-radius:4px;
+  font-size:10px; font-weight:600; font-family:var(--mono);
+  color:var(--red); background:var(--red-dim);
 }
 
 /* ─── Animations ─────────────────── */
